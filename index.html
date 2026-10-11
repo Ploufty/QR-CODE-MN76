@@ -3,11 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob:; font-src 'self' https://cdn.jsdelivr.net; style-src 'self'; script-src 'self'; connect-src 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob:; font-src 'self' https://cdn.jsdelivr.net; style-src 'self'; script-src 'self'; connect-src 'self' https://cdn.jsdelivr.net; manifest-src 'self'">
   <meta name="theme-color" content="#0b5394">
   <title>Générateur de QR codes — Mission numérique 76</title>
   <meta name="description" content="Créez des QR codes (lien, Wi-Fi, contact, texte…), personnalisez-les et exportez-les en PNG, SVG ou en lot. Tout reste dans votre navigateur.">
   <link rel="icon" href="icon.svg">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="QR codes">
   <link rel="stylesheet" href="style.css">
   <script src="prefs.js"></script>
 </head>
@@ -178,6 +182,12 @@ Bonjour !;message</pre></details>
       </fieldset>
 
       <label class="switch"><input type="checkbox" name="contrast"><span>Contraste renforcé</span></label>
+
+      <div class="install" id="install" hidden>
+        <strong>Installer l'application</strong>
+        <button type="button" id="install-btn" class="btn" hidden>Installer sur cet appareil</button>
+        <p id="ios-hint" hidden>Sur iPhone/iPad : appuyez sur <b>Partager</b> puis <b>« Sur l'écran d'accueil »</b>.</p>
+      </div>
 
       <div class="settings-foot">
         <button type="button" id="reset" class="btn btn-ghost">Réinitialiser</button>

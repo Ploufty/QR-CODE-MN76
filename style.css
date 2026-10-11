@@ -223,6 +223,8 @@ legend { margin-bottom: .5rem; font-size: .9rem; font-weight: 700; }
   background-image: radial-gradient(circle at 0.8rem 50%, #fff .6rem, transparent .62rem); transition: background-color .25s, background-position .3s var(--spring);
 }
 .switch input:checked + span::before { background-color: var(--primaire); background-position: 1.15rem 0; }
+.install { padding: 1rem; border-radius: .9rem; background: var(--primaire-doux); font-size: .9rem; display: grid; gap: .75rem; }
+.install p { color: var(--muted); }
 .settings-foot { display: flex; justify-content: flex-end; gap: .5rem; flex-wrap: wrap; }
 
 /* ---------- 8. ANIMATIONS RÉDUITES ---------- */

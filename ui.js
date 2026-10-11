@@ -56,4 +56,20 @@
       }
     });
   }
+
+  /* ===== 3. Application installable & hors ligne ===== */
+  const install = $('#install'), installBtn = $('#install-btn');
+  const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+  let deferred;
+  addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferred = e; install.hidden = installBtn.hidden = false; });
+  installBtn?.addEventListener('click', async () => {
+    if (!deferred) return;
+    deferred.prompt(); await deferred.userChoice; deferred = null; install.hidden = true;
+  });
+  addEventListener('appinstalled', () => { install.hidden = true; });
+  const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.userAgent));
+  if (ios && !standalone) { install.hidden = false; $('#ios-hint').hidden = false; }
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+    addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+  }
 })();
