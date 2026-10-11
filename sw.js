@@ -3,7 +3,7 @@
 const CACHE = 'qr-mn76-v1';
 const ASSETS = [
   './', './index.html', './style.css', './app.js', './ui.js', './prefs.js',
-  './qrcode.js', './icon.svg', './manifest.webmanifest',
+  './qr-code-styling.js', './icon.svg', './manifest.webmanifest',
   './icon-192.png', './icon-512.png', './icon-maskable-512.png', './apple-touch-icon.png'
 ];
 

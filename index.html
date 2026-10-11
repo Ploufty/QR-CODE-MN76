@@ -61,14 +61,48 @@
 
         <details class="block">
           <summary>Personnaliser l'apparence</summary>
+
+          <p class="sublabel">Modèles rapides</p>
+          <div class="presets" id="presets"></div>
+
           <div class="opts">
-            <label>Couleur du QR <input type="color" id="fg" value="#0b5394"></label>
+            <label class="wide">Couleur des modules
+              <span class="seg mini" id="fg-mode">
+                <label><input type="radio" name="fgmode" value="single" checked><span>Unie</span></label>
+                <label><input type="radio" name="fgmode" value="gradient"><span>Dégradé</span></label>
+              </span>
+            </label>
+
+            <label id="fg-single-1">Couleur <input type="color" id="fg" value="#0b5394"></label>
+            <label id="fg-grad-1" hidden>Début du dégradé <input type="color" id="g1" value="#0b5394"></label>
+            <label id="fg-grad-2" hidden>Fin du dégradé <input type="color" id="g2" value="#00727a"></label>
+            <label id="fg-grad-type" hidden>Type de dégradé
+              <select id="gradType"><option value="linear">Linéaire</option><option value="radial">Radial</option></select>
+            </label>
+
+            <label>Style des modules
+              <select id="dotsType">
+                <option value="square">Carrés</option>
+                <option value="dots">Points</option>
+                <option value="rounded">Arrondis</option>
+                <option value="extra-rounded">Très arrondis</option>
+                <option value="classy">Élégant</option>
+                <option value="classy-rounded">Élégant arrondi</option>
+              </select>
+            </label>
             <label>Couleur du fond <input type="color" id="bgcol" value="#ffffff"></label>
+
+            <label>Contour des marqueurs
+              <select id="csType"><option value="square">Carré</option><option value="dot">Cercle</option><option value="extra-rounded">Arrondi</option></select>
+            </label>
+            <label>Couleur du contour <input type="color" id="csColor" value="#0b5394"></label>
+            <label>Centre des marqueurs
+              <select id="cdType"><option value="square">Carré</option><option value="dot">Point</option></select>
+            </label>
+            <label>Couleur du centre <input type="color" id="cdColor" value="#0b5394"></label>
+
             <label>Correction d'erreur
               <select id="ec"><option value="L">Basse</option><option value="M" selected>Moyenne</option><option value="Q">Haute</option><option value="H">Maximale</option></select>
-            </label>
-            <label>Style des modules
-              <select id="shape"><option value="square">Carrés</option><option value="round">Arrondis</option></select>
             </label>
             <label class="wide">Logo au centre (optionnel)
               <input type="file" id="logo" accept="image/*">
@@ -95,6 +129,9 @@
       <section class="panel preview" aria-labelledby="t-preview">
         <h2 id="t-preview" class="cat-head-lite">Aperçu</h2>
         <div id="out" class="out"><p class="out-empty">Remplissez le formulaire pour voir le QR code.</p></div>
+        <label class="size">Taille du PNG : <strong><span id="sizeVal">1024</span> px</strong>
+          <input type="range" id="size" min="256" max="2048" step="128" value="1024">
+        </label>
         <label class="fname">Nom du fichier <input type="text" id="fname" value="qrcode" maxlength="60"></label>
         <div class="tool-actions">
           <button id="dlPng" class="btn" disabled>PNG</button>
@@ -119,10 +156,13 @@
           <li><b>Contact</b> : ajoute une fiche (nom, société, téléphone, e-mail) au répertoire.</li>
           <li><b>E-mail</b> : ouvre un message pré-rempli. <b>Téléphone</b> : lance l'appel.</li></ul></details>
         <details><summary>Personnaliser</summary>
-          <ul><li><b>Couleurs</b> : gardez un fort contraste, QR foncé sur fond clair.</li>
+          <ul><li><b>Modèles rapides</b> : cliquez une vignette pour appliquer une combinaison couleurs + style.</li>
+          <li><b>Couleur des modules</b> : unie, ou <b>dégradé</b> (linéaire/radial) entre deux couleurs. Gardez un fort contraste avec le fond.</li>
+          <li><b>Style des modules</b> et <b>marqueurs</b> (contour et centre) : formes et couleurs réglables séparément.</li>
           <li><b>Correction d'erreur</b> : plus elle est haute, plus le QR résiste aux dégâts, mais plus il est dense.</li>
           <li><b>Logo</b> : petite image au centre (correction forcée au maximum). Vérifiez toujours le scan.</li>
-          <li><b>Texte sous le QR</b> : légende de 40 caractères maximum.</li></ul></details>
+          <li><b>Texte sous le QR</b> : légende de 40 caractères maximum.</li>
+          <li><b>Taille du PNG</b> : curseur côté aperçu, de 256 à 2048 px (impression grand format).</li></ul></details>
         <details><summary>Exporter</summary>
           <ul><li><b>PNG</b> : image pour documents et écrans. <b>SVG</b> : vectoriel, idéal pour l'impression grand format.</li>
           <li><b>Copier</b> : place l'image dans le presse-papiers. <b>Imprimer</b> : ouvre la boîte d'impression.</li>
@@ -196,7 +236,7 @@ Bonjour !;message</pre></details>
     </form>
   </dialog>
 
-  <script src="qrcode.js"></script>
+  <script src="qr-code-styling.js"></script>
   <script src="ui.js"></script>
   <script src="app.js"></script>
 </body>

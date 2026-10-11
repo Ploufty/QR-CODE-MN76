@@ -255,3 +255,15 @@ legend { margin-bottom: .5rem; font-size: .9rem; font-weight: 700; }
   .bg, .actions, .hero, dialog, .block, .tool-actions, .fname, .help, .footer { display: none !important; }
   .panel { box-shadow: none; border: 0; }
 }
+
+/* Presets + contrôles d'apparence avancés */
+.sublabel { font-size: .9rem; font-weight: 700; color: var(--muted); margin: .2rem 0 .5rem; }
+.presets { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.1rem; }
+.presets button { width: 2.6rem; height: 2.6rem; padding: 0; border: 1.5px solid var(--border); border-radius: .6rem; background: #fff; cursor: pointer; transition: transform .2s var(--spring), border-color .2s; overflow: hidden; }
+.presets button:hover { transform: translateY(-2px); border-color: var(--primaire); }
+.presets button svg { width: 100%; height: 100%; display: block; }
+.seg.mini { display: inline-grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: .2rem; padding: .2rem; width: 100%; margin-top: .4rem; }
+.seg.mini span { min-height: 2.2rem; font-size: .82rem; }
+.size { margin-top: 1rem; text-align: left; }
+.size input[type=range] { width: 100%; margin-top: .4rem; accent-color: var(--primaire); }
+.size strong { color: var(--primaire); }

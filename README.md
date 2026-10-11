@@ -1,7 +1,7 @@
 # Générateur de QR codes — Mission numérique 76
 
 Petite application web pour créer des QR codes (lien, Wi-Fi, contact, texte, e-mail, téléphone),
-les personnaliser (couleurs, logo, style, légende) et les exporter en **PNG**, **SVG** ou en **lot (ZIP)**.
+les personnaliser (couleur unie ou **dégradé**, style des modules, **forme et couleur des marqueurs**, logo, légende, modèles rapides) et les exporter en **PNG**, **SVG** ou en **lot (ZIP)**.
 
 Interface conforme à la charte UI de la Mission numérique 76 (style Apps1D76) : palette `ocean`,
 police Marianne, mode clair/sombre, panneau « Affichage » (taille du texte, animations, contraste).
@@ -27,7 +27,7 @@ Puis ouvrez `http://localhost:8080`.
 | `app.js` | Logique QR : génération, personnalisation, export, lot ZIP |
 | `ui.js` | Préférences d'affichage, thème, titre animé |
 | `prefs.js` | Application des préférences avant le premier rendu (anti-flash) |
-| `qrcode.js` | Bibliothèque qrcode-generator 1.4.4 (MIT) |
+| `qr-code-styling.js` | Bibliothèque qr-code-styling 1.9.2 (MIT) — rendu avec dégradés et formes de marqueurs |
 | `icon.svg` | Favicon |
 
 ## Déployer
