@@ -23,9 +23,9 @@
 
   // ---- Modèles rapides (apparence prête à cliquer)
   var PRESETS = [
-    { name: 'Océan', fg: '#0b5394', dots: 'square', cs: 'square', cd: 'square', eye: '#0b5394', bg: '#ffffff' },
+    { name: 'Bleu nuit', fg: '#000091', dots: 'square', cs: 'square', cd: 'square', eye: '#000091', bg: '#ffffff' },
     { name: 'Turquoise arrondi', fg: '#00727a', dots: 'rounded', cs: 'extra-rounded', cd: 'dot', eye: '#00727a', bg: '#ffffff' },
-    { name: 'Dégradé océan', grad: ['#0b5394', '#00727a', 'linear'], dots: 'rounded', cs: 'extra-rounded', cd: 'dot', eye: '#0b5394', bg: '#ffffff' },
+    { name: 'Dégradé océan', grad: ['#000091', '#00727a', 'linear'], dots: 'rounded', cs: 'extra-rounded', cd: 'dot', eye: '#0b5394', bg: '#ffffff' },
     { name: 'Framboise', fg: '#c2185b', dots: 'dots', cs: 'dot', cd: 'dot', eye: '#c2185b', bg: '#ffffff' },
     { name: 'Noir élégant', fg: '#1e1e2f', dots: 'classy-rounded', cs: 'extra-rounded', cd: 'square', eye: '#1e1e2f', bg: '#ffffff' },
     { name: 'Nuit inversée', fg: '#eeeef6', dots: 'classy', cs: 'square', cd: 'square', eye: '#7fb3ff', bg: '#11111b' }
@@ -77,7 +77,13 @@
     ['École', '<path d="M12 4 2 9l10 5 10-5Z"/><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/>'],
     ['Calendrier', '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/>'],
     ['Info', '<circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="8" r="1" fill="currentColor" stroke="none"/>'],
-    ['Globe', '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>']
+    ['Globe', '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>'],
+    ['Vidéo', '<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M10 9.5l5 2.5-5 2.5Z"/>'],
+    ['Document', '<path d="M7 3h7l4 4v14H7Z"/><path d="M14 3v4h4M9 13h6M9 16h6"/>'],
+    ['Téléchargement', '<path d="M12 4v10"/><path d="M8 11l4 4 4-4"/><path d="M5 19h14"/>'],
+    ['Panier', '<path d="M4 5h2l2 10h9l2-7H7.5"/><circle cx="10" cy="19" r="1.3"/><circle cx="17" cy="19" r="1.3"/>'],
+    ['Message', '<path d="M4 5h16v11H9l-4 3Z"/><path d="M8 9h8M8 12h5"/>'],
+    ['Partage', '<circle cx="6" cy="12" r="2.4"/><circle cx="17" cy="6" r="2.4"/><circle cx="17" cy="18" r="2.4"/><path d="M8.2 11l6.6-4M8.2 13l6.6 4"/>']
   ];
   function iconURL(inner, color) {
     return 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="' + color + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + inner + '</svg>');
