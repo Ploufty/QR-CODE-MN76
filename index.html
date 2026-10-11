@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="fr" data-palette="ocean" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob:; font-src 'self' https://cdn.jsdelivr.net; style-src 'self'; script-src 'self'; connect-src 'self'">
+  <meta name="theme-color" content="#0b5394">
+  <title>Générateur de QR codes — Mission numérique 76</title>
+  <meta name="description" content="Créez des QR codes (lien, Wi-Fi, contact, texte…), personnalisez-les et exportez-les en PNG, SVG ou en lot. Tout reste dans votre navigateur.">
+  <link rel="icon" href="icon.svg">
+  <link rel="stylesheet" href="style.css">
+  <script src="prefs.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Aller au contenu</a>
+
+  <div class="bg" aria-hidden="true">
+    <div class="layer layer-a"><span class="blob blob-a"></span></div>
+    <div class="layer layer-b"><span class="blob blob-b"></span></div>
+    <div class="layer layer-c"><span class="dots"></span></div>
+  </div>
+
+  <header>
+    <div class="brandbar container">
+      <a class="brand" href="#main">
+        <b>QR<span>codes</span></b>
+        <small>Mission numérique 76</small>
+      </a>
+      <div class="actions">
+        <button type="button" id="theme-toggle" class="icon-btn" aria-label="Activer le mode sombre">
+          <svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+          <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        </button>
+        <button type="button" id="settings-open" class="icon-btn">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h11M4 12h16M4 17h8"/><circle cx="18.5" cy="7" r="2.2"/><circle cx="8.5" cy="12" r="2.2"/><circle cx="14.5" cy="17" r="2.2"/></svg>
+          <span class="btn-label">Affichage</span>
+        </button>
+      </div>
+    </div>
+
+    <section class="hero container">
+      <div class="hero-content">
+        <h1 data-split>Un <span class="accent">QR code</span> en quelques secondes</h1>
+        <p>Lien, Wi-Fi, contact, texte… Personnalisez les couleurs, ajoutez un logo, exportez en PNG ou SVG. Tout se calcule dans votre navigateur, rien n'est envoyé en ligne.</p>
+      </div>
+    </section>
+  </header>
+
+  <main class="main container" id="main">
+    <div class="tool">
+      <!-- Formulaire -->
+      <section class="panel" aria-labelledby="t-form">
+        <h2 id="t-form" class="cat-head-lite">Contenu</h2>
+
+        <div class="typetabs" id="tabs" role="tablist" aria-label="Type de QR code"></div>
+        <div id="fields" class="fields"></div>
+
+        <details class="block">
+          <summary>Personnaliser l'apparence</summary>
+          <div class="opts">
+            <label>Couleur du QR <input type="color" id="fg" value="#0b5394"></label>
+            <label>Couleur du fond <input type="color" id="bgcol" value="#ffffff"></label>
+            <label>Correction d'erreur
+              <select id="ec"><option value="L">Basse</option><option value="M" selected>Moyenne</option><option value="Q">Haute</option><option value="H">Maximale</option></select>
+            </label>
+            <label>Style des modules
+              <select id="shape"><option value="square">Carrés</option><option value="round">Arrondis</option></select>
+            </label>
+            <label class="wide">Logo au centre (optionnel)
+              <input type="file" id="logo" accept="image/*">
+            </label>
+            <label class="wide">Texte sous le QR (optionnel)
+              <input type="text" id="caption" maxlength="40" placeholder="Scannez-moi">
+            </label>
+          </div>
+        </details>
+
+        <details class="block" id="batch">
+          <summary>Génération en lot</summary>
+          <label>Une ligne par QR code, au format <code>contenu;nom du fichier</code> (le nom est facultatif)
+            <textarea id="lines" rows="5" placeholder="https://exemple.fr;accueil&#10;https://exemple.fr/rh;rh"></textarea>
+          </label>
+          <label class="wide">…ou importer un fichier .csv / .txt
+            <input type="file" id="csv" accept=".csv,.txt">
+          </label>
+          <button type="button" id="zip" class="btn full">Télécharger l'archive ZIP</button>
+        </details>
+      </section>
+
+      <!-- Aperçu -->
+      <section class="panel preview" aria-labelledby="t-preview">
+        <h2 id="t-preview" class="cat-head-lite">Aperçu</h2>
+        <div id="out" class="out"><p class="out-empty">Remplissez le formulaire pour voir le QR code.</p></div>
+        <label class="fname">Nom du fichier <input type="text" id="fname" value="qrcode" maxlength="60"></label>
+        <div class="tool-actions">
+          <button id="dlPng" class="btn" disabled>PNG</button>
+          <button id="dlSvg" class="btn btn-ghost" disabled>SVG</button>
+          <button id="copy" class="btn btn-ghost" disabled>Copier</button>
+          <button id="print" class="btn btn-ghost" disabled>Imprimer</button>
+        </div>
+        <p id="msg" class="msg" role="status" aria-live="polite"></p>
+      </section>
+
+      <!-- Aide -->
+      <section class="panel help" id="aide" aria-labelledby="t-help">
+        <h2 id="t-help" class="cat-head-lite">Aide &amp; mode d'emploi</h2>
+        <details open><summary>Créer un QR code</summary>
+          <ol><li>Choisissez un type : Lien, Texte, Wi-Fi, Contact, E-mail ou Téléphone.</li>
+          <li>Remplissez les champs : l'aperçu se met à jour tout seul.</li>
+          <li>Testez-le avec un téléphone avant de l'imprimer ou de le diffuser.</li></ol></details>
+        <details><summary>Les types de QR code</summary>
+          <ul><li><b>Lien</b> : ouvre un site (le <code>https://</code> est ajouté si oublié).</li>
+          <li><b>Texte</b> : affiche un message libre.</li>
+          <li><b>Wi-Fi</b> : le téléphone propose de se connecter au réseau, sans saisir le mot de passe.</li>
+          <li><b>Contact</b> : ajoute une fiche (nom, société, téléphone, e-mail) au répertoire.</li>
+          <li><b>E-mail</b> : ouvre un message pré-rempli. <b>Téléphone</b> : lance l'appel.</li></ul></details>
+        <details><summary>Personnaliser</summary>
+          <ul><li><b>Couleurs</b> : gardez un fort contraste, QR foncé sur fond clair.</li>
+          <li><b>Correction d'erreur</b> : plus elle est haute, plus le QR résiste aux dégâts, mais plus il est dense.</li>
+          <li><b>Logo</b> : petite image au centre (correction forcée au maximum). Vérifiez toujours le scan.</li>
+          <li><b>Texte sous le QR</b> : légende de 40 caractères maximum.</li></ul></details>
+        <details><summary>Exporter</summary>
+          <ul><li><b>PNG</b> : image pour documents et écrans. <b>SVG</b> : vectoriel, idéal pour l'impression grand format.</li>
+          <li><b>Copier</b> : place l'image dans le presse-papiers. <b>Imprimer</b> : ouvre la boîte d'impression.</li>
+          <li>Le champ « Nom du fichier » définit le nom des téléchargements.</li></ul></details>
+        <details><summary>Génération en lot</summary>
+          <p>Saisissez une ligne par QR code au format <code>contenu;nom</code>. Vous pouvez aussi coller depuis un tableur (colonnes séparées par une tabulation) ou importer un .csv. Maximum 200 lignes. Le ZIP contient chaque QR en PNG et SVG, avec les couleurs et le style choisis ci-dessus.</p>
+          <pre>https://exemple.fr;accueil
+https://exemple.fr/rh;rh
+Bonjour !;message</pre></details>
+        <details><summary>Problèmes fréquents</summary>
+          <ul><li><b>« Contenu trop long »</b> : raccourcissez le texte ou le lien.</li>
+          <li><b>Le QR ne se scanne pas</b> : augmentez le contraste, retirez le logo ou montez la correction d'erreur.</li>
+          <li><b>Copier ne marche pas</b> : certains navigateurs l'interdisent, utilisez PNG.</li>
+          <li><b>Confidentialité</b> : rien n'est envoyé sur un serveur, tout se calcule dans votre navigateur.</li></ul></details>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    Un outil de la <a href="https://prim76.ac-normandie.fr/numerique" target="_blank" rel="noopener">Mission numérique 76</a> développé par Etienne Liaudet
+  </footer>
+
+  <dialog id="settings" aria-labelledby="settings-title">
+    <form method="dialog" class="settings">
+      <div class="settings-head">
+        <h2 id="settings-title">Affichage</h2>
+        <button type="submit" class="icon-btn" aria-label="Fermer">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+
+      <fieldset>
+        <legend>Thème</legend>
+        <div class="seg">
+          <label><input type="radio" name="theme" value="light"><span>Clair</span></label>
+          <label><input type="radio" name="theme" value="dark"><span>Sombre</span></label>
+          <label><input type="radio" name="theme" value="auto"><span>Système</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Taille du texte</legend>
+        <div class="seg">
+          <label><input type="radio" name="text" value="100"><span>Normale</span></label>
+          <label><input type="radio" name="text" value="115"><span class="t115">Grande</span></label>
+          <label><input type="radio" name="text" value="130"><span class="t130">Très grande</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Animations</legend>
+        <div class="seg">
+          <label><input type="radio" name="motion" value="on"><span>Activées</span></label>
+          <label><input type="radio" name="motion" value="reduce"><span>Réduites</span></label>
+          <label><input type="radio" name="motion" value="auto"><span>Système</span></label>
+        </div>
+      </fieldset>
+
+      <label class="switch"><input type="checkbox" name="contrast"><span>Contraste renforcé</span></label>
+
+      <div class="settings-foot">
+        <button type="button" id="reset" class="btn btn-ghost">Réinitialiser</button>
+        <button type="submit" class="btn">Fermer</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="qrcode.js"></script>
+  <script src="ui.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
