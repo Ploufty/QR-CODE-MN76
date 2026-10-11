@@ -13,6 +13,8 @@
 :root, [data-palette="republique"]          { --primaire: #000091; --accent: #e1000f; }
 [data-theme="dark"], [data-palette="republique"][data-theme="dark"] { --primaire: #8585f6; --accent: #ff6f68; }
 [data-palette="ocean"]                      { --primaire: #0b5394; --accent: #00727a; }
+[data-palette="vertviolet"]                { --primaire: #166534; --accent: #6d28d9; }   /* vert foncé / violet */
+[data-palette="vertviolet"][data-theme="dark"] { --primaire: #4ade80; --accent: #c4b5fd; }
 [data-palette="ocean"][data-theme="dark"]   { --primaire: #7fb3ff; --accent: #4fd1d9; }
 [data-palette="foret"]                      { --primaire: #1e5631; --accent: #a64500; }
 [data-palette="foret"][data-theme="dark"]   { --primaire: #6fcf8f; --accent: #f59e52; }

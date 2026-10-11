@@ -23,9 +23,9 @@
 
   // ---- Modèles rapides (apparence prête à cliquer)
   var PRESETS = [
-    { name: 'Bleu nuit', fg: '#000091', dots: 'square', cs: 'square', cd: 'square', eye: '#000091', bg: '#ffffff' },
+    { name: 'Vert', fg: '#166534', dots: 'square', cs: 'square', cd: 'square', eye: '#166534', bg: '#ffffff' },
     { name: 'Turquoise arrondi', fg: '#00727a', dots: 'rounded', cs: 'extra-rounded', cd: 'dot', eye: '#00727a', bg: '#ffffff' },
-    { name: 'Dégradé océan', grad: ['#000091', '#00727a', 'linear'], dots: 'rounded', cs: 'extra-rounded', cd: 'dot', eye: '#0b5394', bg: '#ffffff' },
+    { name: 'Dégradé vert-violet', grad: ['#166534', '#6d28d9', 'linear'], dots: 'rounded', cs: 'extra-rounded', cd: 'dot', eye: '#0b5394', bg: '#ffffff' },
     { name: 'Framboise', fg: '#c2185b', dots: 'dots', cs: 'dot', cd: 'dot', eye: '#c2185b', bg: '#ffffff' },
     { name: 'Noir élégant', fg: '#1e1e2f', dots: 'classy-rounded', cs: 'extra-rounded', cd: 'square', eye: '#1e1e2f', bg: '#ffffff' },
     { name: 'Nuit inversée', fg: '#eeeef6', dots: 'classy', cs: 'square', cd: 'square', eye: '#7fb3ff', bg: '#11111b' }
