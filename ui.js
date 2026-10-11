@@ -72,4 +72,10 @@
   if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
     addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
   }
+
+  /* ===== 4. Panneau d'aide ===== */
+  const help = $('#help');
+  $('#help-open').addEventListener('click', () => { help.showModal ? help.showModal() : help.setAttribute('open', ''); });
+  $('#help-close').addEventListener('click', () => help.close());
+  help.addEventListener('click', e => { if (e.target === help) help.close(); });
 })();

@@ -31,8 +31,57 @@
     { name: 'Nuit inversée', fg: '#eeeef6', dots: 'classy', cs: 'square', cd: 'square', eye: '#7fb3ff', bg: '#11111b' }
   ];
 
-  var type = 'url', svg = '', logoURL = '', timer, token = 0;
+  var type = 'url', svg = '', logoURL = '', logoIcon = -1, timer, token = 0;
   var LOGO_SIZE = 0.4;
+  var shape = { dotsType: 'square', csType: 'square', cdType: 'square' };
+
+  // ---- Vignettes de formes (glyphes SVG, viewBox 0 0 24 24, currentColor)
+  function dotGlyph(t) {
+    var cells = [[3, 3], [13, 3], [3, 13], [13, 13]], p = '';
+    cells.forEach(function (o) {
+      var x = o[0], y = o[1];
+      if (t === 'dots') p += '<circle cx="' + (x + 4) + '" cy="' + (y + 4) + '" r="4"/>';
+      else if (t === 'rounded') p += '<rect x="' + x + '" y="' + y + '" width="8" height="8" rx="2"/>';
+      else if (t === 'extra-rounded') p += '<rect x="' + x + '" y="' + y + '" width="8" height="8" rx="4"/>';
+      else if (t === 'classy') p += '<path d="M' + (x + 4) + ' ' + y + ' H' + (x + 8) + ' V' + (y + 8) + ' H' + x + ' V' + (y + 4) + ' A4 4 0 0 1 ' + (x + 4) + ' ' + y + ' Z"/>';
+      else if (t === 'classy-rounded') p += '<path d="M' + (x + 4) + ' ' + y + ' H' + (x + 8) + ' V' + (y + 4) + ' A4 4 0 0 1 ' + (x + 4) + ' ' + (y + 8) + ' H' + x + ' V' + (y + 4) + ' A4 4 0 0 1 ' + (x + 4) + ' ' + y + ' Z"/>';
+      else p += '<rect x="' + x + '" y="' + y + '" width="8" height="8"/>';
+    });
+    return '<svg viewBox="0 0 24 24" fill="currentColor">' + p + '</svg>';
+  }
+  function frameGlyph(t) {
+    var inner = t === 'dot' ? '<circle cx="12" cy="12" r="8"/>' : '<rect x="4" y="4" width="16" height="16" rx="' + (t === 'extra-rounded' ? 5 : 0) + '"/>';
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">' + inner + '</svg>';
+  }
+  function ballGlyph(t) {
+    return '<svg viewBox="0 0 24 24" fill="currentColor">' + (t === 'dot' ? '<circle cx="12" cy="12" r="5"/>' : '<rect x="7" y="7" width="10" height="10"/>') + '</svg>';
+  }
+  var SHAPES = {
+    dotsType: [['square', 'Carrés'], ['dots', 'Points'], ['rounded', 'Arrondis'], ['extra-rounded', 'Très arrondis'], ['classy', 'Élégant'], ['classy-rounded', 'Élégant arrondi']].map(function (o) { return [o[0], o[1], dotGlyph(o[0])]; }),
+    csType: [['square', 'Carré'], ['dot', 'Cercle'], ['extra-rounded', 'Arrondi']].map(function (o) { return [o[0], o[1], frameGlyph(o[0])]; }),
+    cdType: [['square', 'Carré'], ['dot', 'Point']].map(function (o) { return [o[0], o[1], ballGlyph(o[0])]; })
+  };
+
+  // ---- Galerie d'icônes de logo (SVG au trait, sans dépendance ni réseau)
+  var ICONS = [
+    ['Lien', '<path d="M10 14a4 4 0 0 1 0-6l2-2a4 4 0 0 1 6 6l-1 1"/><path d="M14 10a4 4 0 0 1 0 6l-2 2a4 4 0 0 1-6-6l1-1"/>'],
+    ['Wi-Fi', '<path d="M5 12.5a10 10 0 0 1 14 0"/><path d="M8 15.5a6 6 0 0 1 8 0"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/>'],
+    ['E-mail', '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>'],
+    ['Téléphone', '<path d="M5 4h3l2 5-2 1a11 11 0 0 0 5 5l1-2 5 2v3a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z"/>'],
+    ['Maison', '<path d="M4 11l8-7 8 7"/><path d="M6 10v9h12v-9"/>'],
+    ['Cœur', '<path d="M12 20s-7-4.5-7-9a4 4 0 0 1 7-2.5A4 4 0 0 1 19 11c0 4.5-7 9-7 9Z"/>'],
+    ['Étoile', '<path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19l1-5.8L3.5 9.2l5.9-.9Z"/>'],
+    ['Lieu', '<path d="M12 21s-6-5.3-6-10a6 6 0 0 1 12 0c0 4.7-6 10-6 10Z"/><circle cx="12" cy="11" r="2.3"/>'],
+    ['Appareil photo', '<path d="M4 8h3l2-2h6l2 2h3v11H4Z"/><circle cx="12" cy="13" r="3.2"/>'],
+    ['Musique', '<path d="M9 18V6l10-2v12"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="16" r="2"/>'],
+    ['École', '<path d="M12 4 2 9l10 5 10-5Z"/><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/>'],
+    ['Calendrier', '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/>'],
+    ['Info', '<circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="8" r="1" fill="currentColor" stroke="none"/>'],
+    ['Globe', '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>']
+  ];
+  function iconURL(inner, color) {
+    return 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="' + color + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + inner + '</svg>');
+  }
 
   // ======================= UI =======================
   function renderTabs() {
@@ -86,22 +135,63 @@
   function applyPreset(p) {
     if (p.grad) { document.querySelector('input[name=fgmode][value=gradient]').checked = true; $('g1').value = p.grad[0]; $('g2').value = p.grad[1]; $('gradType').value = p.grad[2]; }
     else { document.querySelector('input[name=fgmode][value=single]').checked = true; $('fg').value = p.fg; }
-    $('dotsType').value = p.dots; $('csType').value = p.cs; $('cdType').value = p.cd;
+    shape.dotsType = p.dots; shape.csType = p.cs; shape.cdType = p.cd; markShapes();
     $('csColor').value = p.eye; $('cdColor').value = p.eye; $('bgcol').value = p.bg;
     syncFgMode(); update();
   }
 
+  // ---- Sélecteurs visuels de formes
+  function renderShapes() {
+    Object.keys(SHAPES).forEach(function (id) {
+      var box = $(id); box.innerHTML = '';
+      SHAPES[id].forEach(function (o) {
+        var b = document.createElement('button');
+        b.type = 'button'; b.title = o[1]; b.setAttribute('aria-label', o[1]); b.dataset.val = o[0];
+        b.innerHTML = o[2];
+        b.onclick = function () { shape[id] = o[0]; markShapes(); update(); };
+        box.appendChild(b);
+      });
+    });
+    markShapes();
+  }
+  function markShapes() {
+    Object.keys(SHAPES).forEach(function (id) {
+      $(id).querySelectorAll('button').forEach(function (b) { b.classList.toggle('on', b.dataset.val === shape[id]); });
+    });
+  }
+
+  // ---- Galerie d'icônes de logo
+  function renderIcons() {
+    var grid = $('icongrid'); grid.innerHTML = '';
+    ICONS.forEach(function (ic, i) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.title = ic[0]; b.setAttribute('aria-label', 'Icône ' + ic[0]);
+      b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + ic[1] + '</svg>';
+      b.onclick = function () { selectIcon(i); };
+      grid.appendChild(b);
+    });
+    grid.style.color = $('logoColor').value;
+  }
+  function markIcons() {
+    $('icongrid').querySelectorAll('button').forEach(function (b, i) { b.classList.toggle('on', i === logoIcon); });
+    $('logoClear').hidden = !logoURL;
+  }
+  function selectIcon(i) {
+    logoIcon = i; logoURL = iconURL(ICONS[i][1], $('logoColor').value); $('logo').value = '';
+    markIcons(); update();
+  }
+
   // ======================= Rendu QR =======================
   function qrOptions(data) {
-    var dots = { type: $('dotsType').value };
+    var dots = { type: shape.dotsType };
     if (fgMode() === 'gradient') dots.gradient = { type: $('gradType').value, rotation: 0, colorStops: [{ offset: 0, color: $('g1').value }, { offset: 1, color: $('g2').value }] };
     else dots.color = $('fg').value;
     var o = {
       width: 300, height: 300, type: 'svg', data: data, margin: 8,
       qrOptions: { errorCorrectionLevel: logoURL ? 'H' : $('ec').value },
       dotsOptions: dots,
-      cornersSquareOptions: { type: $('csType').value, color: $('csColor').value },
-      cornersDotOptions: { type: $('cdType').value, color: $('cdColor').value },
+      cornersSquareOptions: { type: shape.csType, color: $('csColor').value },
+      cornersDotOptions: { type: shape.cdType, color: $('cdColor').value },
       backgroundOptions: { color: $('bgcol').value }
     };
     if (logoURL) { o.image = logoURL; o.imageOptions = { margin: 3, imageSize: LOGO_SIZE, hideBackgroundDots: true }; }
@@ -169,11 +259,17 @@
     w.document.close(); w.focus(); w.print();
   };
 
+  $('logoUpload').onclick = function () { $('logo').click(); };
   $('logo').onchange = function () {
     var f = this.files[0];
-    if (!f) { logoURL = ''; return update(); }
-    var r = new FileReader(); r.onload = function () { logoURL = r.result; update(); }; r.readAsDataURL(f);
+    if (!f) return;
+    var r = new FileReader(); r.onload = function () { logoIcon = -1; logoURL = r.result; markIcons(); update(); }; r.readAsDataURL(f);
   };
+  $('logoColor').addEventListener('input', function () {
+    $('icongrid').style.color = this.value;
+    if (logoIcon >= 0) { logoURL = iconURL(ICONS[logoIcon][1], this.value); update(); }
+  });
+  $('logoClear').onclick = function () { logoURL = ''; logoIcon = -1; $('logo').value = ''; markIcons(); update(); };
 
   // ======================= Génération en lot (ZIP sans compression) =======================
   var CRC = (function () { var t = [], n, k, c; for (n = 0; n < 256; n++) { c = n; for (k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
@@ -221,5 +317,5 @@
   $('fg-mode').addEventListener('change', syncFgMode);
   $('tabs').closest('.panel').addEventListener('input', function () { clearTimeout(timer); timer = setTimeout(update, 120); });
 
-  renderTabs(); renderFields(); renderPresets(); update();
+  renderTabs(); renderFields(); renderPresets(); renderShapes(); renderIcons(); update();
 })();
