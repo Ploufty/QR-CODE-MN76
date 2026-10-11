@@ -34,6 +34,23 @@
   var type = 'url', svg = '', logoURL = '', logoIcon = -1, timer, token = 0;
   var LOGO_SIZE = 0.4;
   var shape = { dotsType: 'square', csType: 'square', cdType: 'square' };
+  var frameStyle = 'classic';
+
+  // ---- Exemples de cadre (clic = active le cadre + applique style et couleurs)
+  var FRAMES = [
+    { name: 'Classique', style: 'classic', fcol: '#166534', tcol: '#ffffff' },
+    { name: 'Texte en haut', style: 'top', fcol: '#6d28d9', tcol: '#ffffff' },
+    { name: 'Ruban', style: 'ribbon', fcol: '#1e1e2f', tcol: '#ffffff' },
+    { name: 'Pilule', style: 'pill', fcol: '#166534', tcol: '#ffffff' },
+    { name: 'Framboise', style: 'classic', fcol: '#c2185b', tcol: '#ffffff' }
+  ];
+  function frameGlyphBox(ex) {
+    var r = { classic: 4, top: 4, ribbon: 1, pill: 8 }[ex.style], top = ex.style === 'top';
+    return '<svg viewBox="0 0 24 24">' +
+      '<rect x="2" y="2" width="20" height="20" rx="' + r + '" fill="' + ex.fcol + '"/>' +
+      '<rect x="6" y="' + (top ? 11 : 5) + '" width="12" height="8" rx="1" fill="#fff"/>' +
+      '<rect x="7" y="' + (top ? 5 : 16) + '" width="10" height="3" rx="1" fill="' + ex.tcol + '"/></svg>';
+  }
 
   // ---- Vignettes de formes (glyphes SVG, viewBox 0 0 24 24, currentColor)
   function dotGlyph(t) {
@@ -187,6 +204,42 @@
     markIcons(); update();
   }
 
+  // ---- Cadre : exemples + emballage du SVG
+  function renderFrames() {
+    var box = $('frameStyle'); box.innerHTML = '';
+    FRAMES.forEach(function (ex, i) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.title = ex.name; b.setAttribute('aria-label', 'Cadre ' + ex.name); b.dataset.i = i;
+      b.innerHTML = frameGlyphBox(ex);
+      b.onclick = function () { applyFrame(ex); };
+      box.appendChild(b);
+    });
+  }
+  function markFrames() {
+    $('frameStyle').querySelectorAll('button').forEach(function (b) {
+      var ex = FRAMES[b.dataset.i];
+      b.classList.toggle('on', $('frameOn').checked && ex.style === frameStyle && ex.fcol === $('frameColor').value);
+    });
+  }
+  function applyFrame(ex) {
+    $('frameOn').checked = true; $('frameOpts').hidden = false;
+    frameStyle = ex.style; $('frameColor').value = ex.fcol; $('frameTextColor').value = ex.tcol;
+    markFrames(); update();
+  }
+  // Emballe le QR (svg 300x300) dans un cadre coloré avec un bandeau de texte
+  function framed(qr, text) {
+    var M = 22, B = 56, fcol = $('frameColor').value, tcol = $('frameTextColor').value;
+    var r = { classic: 24, top: 24, ribbon: 6, pill: 42 }[frameStyle] || 24, top = frameStyle === 'top';
+    var TW = 300 + 2 * M, TH = 300 + M + B, qy = top ? B : M, ty = top ? B / 2 : M + 300 + B / 2;
+    var inner = qr.replace(/^[\s\S]*?<svg[^>]*>/, '').replace(/<\/svg>\s*$/, '');
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + TW + ' ' + TH + '" width="' + TW + '" height="' + TH + '">' +
+      '<rect width="' + TW + '" height="' + TH + '" rx="' + r + '" fill="' + fcol + '"/>' +
+      '<rect x="' + (M - 8) + '" y="' + (qy - 8) + '" width="316" height="316" rx="10" fill="#ffffff"/>' +
+      '<g transform="translate(' + M + ' ' + qy + ')">' + inner + '</g>' +
+      (text ? '<text x="' + (TW / 2) + '" y="' + ty + '" font-family="Marianne, system-ui, sans-serif" font-size="26" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="' + tcol + '">' + xml(text) + '</text>' : '') +
+      '</svg>';
+  }
+
   // ======================= Rendu QR =======================
   function qrOptions(data) {
     var dots = { type: shape.dotsType };
@@ -207,7 +260,9 @@
   function buildSVG(data, withCaption) {
     var q = new QRCodeStyling(qrOptions(data));
     return q.getRawData('svg').then(function (blob) { return blob.text(); }).then(function (s) {
-      var cap = withCaption ? $('caption').value.trim() : '';
+      var text = $('caption').value.trim();
+      if ($('frameOn').checked) return framed(s, text || 'SCANNEZ-MOI');
+      var cap = withCaption ? text : '';
       if (cap) {
         var col = fgMode() === 'gradient' ? $('g1').value : $('fg').value, bg = $('bgcol').value;
         s = s.replace(/viewBox="0 0 300 300"/, 'viewBox="0 0 300 334"').replace(/height="300"/, 'height="334"'); // 1re occurrence = balise <svg>
@@ -321,7 +376,9 @@
   // ======================= Écouteurs =======================
   $('size').addEventListener('input', function () { $('sizeVal').textContent = this.value; });
   $('fg-mode').addEventListener('change', syncFgMode);
+  $('frameOn').addEventListener('change', function () { $('frameOpts').hidden = !this.checked; markFrames(); update(); });
+  $('frameColor').addEventListener('input', markFrames);
   $('tabs').closest('.panel').addEventListener('input', function () { clearTimeout(timer); timer = setTimeout(update, 120); });
 
-  renderTabs(); renderFields(); renderPresets(); renderShapes(); renderIcons(); update();
+  renderTabs(); renderFields(); renderPresets(); renderShapes(); renderIcons(); renderFrames(); update();
 })();

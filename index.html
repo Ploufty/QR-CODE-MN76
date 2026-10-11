@@ -109,9 +109,19 @@
                 <button type="button" id="logoClear" class="btn btn-ghost" hidden>Retirer</button>
               </div>
             </div>
-            <label class="wide">Texte sous le QR (optionnel)
+            <label class="wide">Texte sous le QR / du cadre (optionnel)
               <input type="text" id="caption" maxlength="40" placeholder="Scannez-moi">
             </label>
+
+            <div class="wide pickwrap">
+              <label class="switch frame-switch"><input type="checkbox" id="frameOn"><span>Encadrer le QR (cadre + texte)</span></label>
+              <span class="picklabel">Exemples de cadre (un clic active le cadre)</span>
+              <div class="shapes" id="frameStyle" role="group" aria-label="Exemples de cadre"></div>
+              <div id="frameOpts" class="opts" hidden>
+                <label>Couleur du cadre <input type="color" id="frameColor" value="#166534"></label>
+                <label>Couleur du texte <input type="color" id="frameTextColor" value="#ffffff"></label>
+              </div>
+            </div>
           </div>
         </details>
 
@@ -177,6 +187,7 @@
           <li><b>Correction d'erreur</b> : plus elle est haute, plus le QR résiste aux dégâts, mais plus il est dense.</li>
           <li><b>Logo</b> : choisissez une <b>icône</b> de la galerie (couleur réglable) ou <b>importez votre image</b>. Elle se place au centre (correction forcée au maximum) ; vérifiez toujours le scan.</li>
           <li><b>Texte sous le QR</b> : légende de 40 caractères maximum.</li>
+          <li><b>Cadre</b> : encadrez le QR avec un bandeau de texte. 5 exemples prêts à cliquer, couleurs du cadre et du texte réglables ; le texte est celui du champ ci-dessus.</li>
           <li><b>Taille du PNG</b> : curseur côté aperçu, de 256 à 2048 px (impression grand format).</li></ul></details>
         <details><summary>Exporter</summary>
           <ul><li><b>PNG</b> : image pour documents et écrans. <b>SVG</b> : vectoriel, idéal pour l'impression grand format.</li>

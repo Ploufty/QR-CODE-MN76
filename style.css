@@ -291,3 +291,6 @@ legend { margin-bottom: .5rem; font-size: .9rem; font-weight: 700; }
 .logo-color input[type=color] { width: 2.6rem; height: 2.3rem; margin: 0; padding: 2px; }
 #help { width: min(34rem, calc(100% - 2rem)); }
 #help .help { padding: 0 1.5rem 1.5rem; }
+
+.frame-switch { margin-bottom: .6rem; }
+#frameOpts { margin-top: .4rem; }
