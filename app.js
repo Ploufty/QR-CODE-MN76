@@ -144,6 +144,7 @@
     return v;
   }
   function fgMode() { return document.querySelector('input[name=fgmode]:checked').value; }
+  function transparentOn() { return document.querySelector('input[name=bgmode]:checked').value === 'transparent'; }
   function syncFgMode() {
     var grad = fgMode() === 'gradient';
     $('fg-single-1').hidden = grad;
@@ -284,7 +285,7 @@
       dotsOptions: dots,
       cornersSquareOptions: { type: shape.csType, color: $('csColor').value },
       cornersDotOptions: { type: shape.cdType, color: $('cdColor').value },
-      backgroundOptions: { color: $('transparent').checked ? 'transparent' : $('bgcol').value }
+      backgroundOptions: { color: transparentOn() ? 'transparent' : $('bgcol').value }
     };
     if (logoURL) { o.image = logoURL; o.imageOptions = { margin: 3, imageSize: LOGO_SIZE, hideBackgroundDots: true }; }
     return o;
@@ -298,7 +299,7 @@
       var cap = withCaption ? text : '';
       if (cap) {
         var col = fgMode() === 'gradient' ? $('g1').value : $('fg').value;
-        var bg = $('transparent').checked ? 'transparent' : $('bgcol').value;
+        var bg = transparentOn() ? 'transparent' : $('bgcol').value;
         s = s.replace(/viewBox="0 0 300 300"/, 'viewBox="0 0 300 334"').replace(/height="300"/, 'height="334"'); // 1re occurrence = balise <svg>
         s = s.replace('</svg>', '<rect x="0" y="300" width="300" height="34" fill="' + bg + '"/>' +
           '<text x="150" y="323" font-family="Marianne, system-ui, sans-serif" font-size="17" font-weight="700" text-anchor="middle" fill="' + col + '">' + xml(cap) + '</text></svg>');
@@ -331,7 +332,7 @@
     shape = { dotsType: 'square', csType: 'square', cdType: 'square' }; markShapes();
     logoURL = ''; logoIcon = -1; $('logo').value = ''; markIcons();
     $('frameOn').checked = false; $('frameOpts').hidden = true; frameStyle = 'classic'; setVal('frameColor', '#000000'); setVal('frameTextColor', '#ffffff'); markFrames();
-    $('caption').value = ''; $('transparent').checked = false; $('ec').value = 'M';
+    $('caption').value = ''; document.querySelector('input[name=bgmode][value=opaque]').checked = true; $('ec').value = 'M';
     $('size').value = 1024; $('sizeVal').textContent = '1024';
     update();
   }
@@ -339,12 +340,18 @@
   // ======================= Export =======================
   function toPNG(cb, px, src) {
     src = src || svg;
-    var img = new Image(), vb = src.match(/viewBox="0 0 ([\d.]+) ([\d.]+)"/), w = px || +$('size').value, h = Math.round(w * vb[2] / vb[1]);
+    var vb = src.match(/viewBox="0 0 ([\d.]+) ([\d.]+)"/), w = px || +$('size').value, h = Math.round(w * vb[2] / vb[1]);
+    var url = URL.createObjectURL(new Blob([src], { type: 'image/svg+xml' }));   // Blob URL : fiable même en grande taille
+    var img = new Image();
     img.onload = function () {
       var cv = document.createElement('canvas'); cv.width = w; cv.height = h;
-      cv.getContext('2d').drawImage(img, 0, 0, w, h); cv.toBlob(cb, 'image/png');
+      cv.getContext('2d').drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      try { cv.toBlob(function (bl) { bl ? cb(bl) : say('Export PNG impossible sur ce navigateur, essayez SVG.'); }, 'image/png'); }
+      catch (e) { say('Export PNG impossible sur ce navigateur, essayez SVG.'); }
     };
-    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(src);
+    img.onerror = function () { URL.revokeObjectURL(url); say('Export PNG impossible, essayez SVG.'); };
+    img.src = url;
   }
   function save(blob, name) {
     var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click();

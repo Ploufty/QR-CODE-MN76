@@ -50,10 +50,10 @@
 
 /* ---------- 3. BASE ---------- */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-html { font-size: calc(var(--text-scale, 1) * var(--base, 100%)); scroll-behavior: smooth; overflow-x: hidden; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+html { font-size: calc(var(--text-scale, 1) * var(--base, 100%)); scroll-behavior: smooth; overflow-x: clip; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 body {
   font: 400 1rem/1.5 var(--font); color: var(--text); background: var(--bg);
-  overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column;
+  overflow-x: clip; min-height: 100vh; display: flex; flex-direction: column;
   transition: background-color .4s, color .4s;
 }
 main { flex: 1; }
@@ -170,7 +170,7 @@ input[type=color] { display: block; margin-top: .4rem; width: 100%; height: 2.6r
 .out svg { width: 100%; height: auto; max-width: 16rem; }
 .out-empty { color: var(--muted); font-size: .92rem; max-width: 14rem; }
 .fname { margin-top: 1rem; text-align: left; }
-.tool-actions { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; margin-top: 1rem; }
+.tool-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; margin-top: .7rem; }
 .msg { min-height: 1.3em; margin-top: .7rem; font-size: .88rem; color: var(--accent); font-weight: 700; }
 
 .btn { min-height: 2.75rem; padding: .5rem 1.2rem; font-weight: 700; border: 1.5px solid var(--primaire); border-radius: 999px; background: var(--primaire); color: var(--on-accent); transition: transform .25s var(--spring), opacity .2s; }
@@ -329,3 +329,19 @@ legend { margin-bottom: .5rem; font-size: .9rem; font-weight: 700; }
 .swatch:hover { transform: scale(1.12); border-color: var(--primaire); }
 .brush { width: 2rem; height: 2rem; padding: 0; display: grid; place-items: center; border: 1.5px solid var(--border); border-radius: .4rem; cursor: pointer; background: var(--c, #fff); }
 .brush svg { width: 1.1rem; height: 1.1rem; color: #fff; filter: drop-shadow(0 0 1px rgba(0,0,0,.6)); }
+
+/* ===== v8 : choix de fond, boutons, fluidité ===== */
+.bg-label { margin: 1rem 0 .4rem; }
+.bg-choice { max-width: 22rem; }
+.preview .btn.full { margin-top: .9rem; }
+/* Aperçu stable : hauteur bornée pour éviter les sauts de mise en page */
+.out { min-height: 17rem; }
+.out svg { max-height: 20rem; }
+/* Sous-sections : ouverture plus douce */
+.sub > summary { transition: background-color .2s; border-radius: .7rem; }
+.sub > summary:hover { background: var(--primaire-doux); }
+.sub[open] > summary { border-radius: .7rem .7rem 0 0; }
+/* Sticky : la colonne outil doit laisser l'aperçu coller */
+.tool { align-items: start; }
+.preview { position: sticky; top: .8rem; align-self: start; }
+@media (max-width: 860px) { .preview { position: static; } }

@@ -88,7 +88,6 @@
                 <div class="shapes" id="dotsType" role="group" aria-label="Style des modules"></div>
               </div>
               <label class="wide">Couleur du fond <input type="color" id="bgcol" value="#ffffff"></label>
-              <label class="switch wide"><input type="checkbox" id="transparent"><span>Fond transparent (export PNG/SVG)</span></label>
               <label>Correction d'erreur
                 <select id="ec"><option value="L">Basse</option><option value="M" selected>Moyenne</option><option value="Q">Haute</option><option value="H">Maximale</option></select>
               </label>
@@ -156,9 +155,14 @@
         <label class="size">Taille du PNG : <strong><span id="sizeVal">1024</span> px</strong>
           <input type="range" id="size" min="256" max="2048" step="128" value="1024">
         </label>
+        <p class="picklabel bg-label">Fond de l'image</p>
+        <div class="seg bg-choice" id="bgMode">
+          <label><input type="radio" name="bgmode" value="opaque" checked><span>Avec fond</span></label>
+          <label><input type="radio" name="bgmode" value="transparent"><span>Transparent</span></label>
+        </div>
         <label class="fname">Nom du fichier <input type="text" id="fname" value="qrcode" maxlength="60"></label>
+        <button id="dlPng" class="btn full" disabled>Télécharger le PNG</button>
         <div class="tool-actions">
-          <button id="dlPng" class="btn" disabled>PNG</button>
           <button id="dlSvg" class="btn btn-ghost" disabled>SVG</button>
           <button id="copy" class="btn btn-ghost" disabled>Copier</button>
           <button id="print" class="btn btn-ghost" disabled>Imprimer</button>
