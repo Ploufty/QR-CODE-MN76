@@ -435,6 +435,7 @@
   $('fg-mode').addEventListener('change', syncFgMode);
   $('frameOn').addEventListener('change', function () { $('frameOpts').hidden = !this.checked; markFrames(); update(); });
   $('frameColor').addEventListener('input', markFrames);
+  $('bgMode').addEventListener('change', update);   // dans le panneau Aperçu, hors de l'écouteur du formulaire
   $('resetBtn').addEventListener('click', reset);
   $('tabs').closest('.panel').addEventListener('input', function () { clearTimeout(timer); timer = setTimeout(update, 120); });
 
