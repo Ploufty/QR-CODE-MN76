@@ -78,4 +78,45 @@
   $('#help-open').addEventListener('click', () => { help.showModal ? help.showModal() : help.setAttribute('open', ''); });
   $('#help-close').addEventListener('click', () => help.close());
   help.addEventListener('click', e => { if (e.target === help) help.close(); });
+
+  /* ===== 5. Fond : nuage de pixels (clin d'œil au QR code) ===== */
+  const cv = $('#bgcanvas');
+  if (cv) {
+    const ctx = cv.getContext('2d');
+    const reduce = () => root.dataset.motion === 'reduce';
+    let W = 0, H = 0, px = [], raf = 0;
+    const cols = () => {
+      const cs = getComputedStyle(root);
+      return [cs.getPropertyValue('--primaire').trim(), cs.getPropertyValue('--accent').trim()];
+    };
+    function init() {
+      const dpr = Math.min(devicePixelRatio || 1, 2);
+      W = innerWidth; H = innerHeight;
+      cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const n = Math.round(Math.min(90, W * H / 26000));
+      px = Array.from({ length: n }, () => ({
+        x: Math.random() * W, y: Math.random() * H, s: 5 + Math.random() * 11,
+        vx: (Math.random() - .5) * .25, vy: (Math.random() - .5) * .25, a: .05 + Math.random() * .1, c: Math.random() < .25 ? 1 : 0
+      }));
+    }
+    function draw() {
+      raf = 0;
+      const [p, a] = cols();
+      ctx.clearRect(0, 0, W, H);
+      px.forEach(q => {
+        q.x += q.vx; q.y += q.vy;
+        if (q.x < -20) q.x = W + 20; if (q.x > W + 20) q.x = -20;
+        if (q.y < -20) q.y = H + 20; if (q.y > H + 20) q.y = -20;
+        ctx.globalAlpha = q.a; ctx.fillStyle = q.c ? a : p;
+        ctx.fillRect(q.x, q.y, q.s, q.s);
+      });
+      ctx.globalAlpha = 1;
+      if (!reduce() && !document.hidden) raf = requestAnimationFrame(draw);
+    }
+    const start = () => { if (!raf) draw(); };
+    init(); start();
+    let t; addEventListener('resize', () => { clearTimeout(t); t = setTimeout(() => { init(); start(); }, 200); });
+    document.addEventListener('visibilitychange', start);
+    matchMedia('(prefers-reduced-motion: reduce)').addEventListener?.('change', start);
+  }
 })();

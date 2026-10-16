@@ -21,14 +21,18 @@
       build: function (v) { return v.n ? 'tel:' + v.n.replace(/[^\d+]/g, '') : ''; } }
   };
 
-  // ---- Modèles rapides (apparence prête à cliquer)
+  // ---- Couleurs prédéfinies (swatches communs)
+  var COLORS = ['#000000', '#ffffff', '#166534', '#6d28d9', '#c2185b', '#0b5394', '#00727a', '#e1000f', '#f59e0b', '#1e1e2f'];
+  var BRUSH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4l5 5-9 9H6v-5z"/><path d="M4 20h4"/></svg>';
+
+  // ---- Modèles rapides (variés : montrent formes et marqueurs disponibles)
   var PRESETS = [
-    { name: 'Vert', fg: '#166534', dots: 'square', cs: 'square', cd: 'square', eye: '#166534', bg: '#ffffff' },
-    { name: 'Turquoise arrondi', fg: '#00727a', dots: 'rounded', cs: 'extra-rounded', cd: 'dot', eye: '#00727a', bg: '#ffffff' },
-    { name: 'Dégradé vert-violet', grad: ['#166534', '#6d28d9', 'linear'], dots: 'rounded', cs: 'extra-rounded', cd: 'dot', eye: '#0b5394', bg: '#ffffff' },
-    { name: 'Framboise', fg: '#c2185b', dots: 'dots', cs: 'dot', cd: 'dot', eye: '#c2185b', bg: '#ffffff' },
-    { name: 'Noir élégant', fg: '#1e1e2f', dots: 'classy-rounded', cs: 'extra-rounded', cd: 'square', eye: '#1e1e2f', bg: '#ffffff' },
-    { name: 'Nuit inversée', fg: '#eeeef6', dots: 'classy', cs: 'square', cd: 'square', eye: '#7fb3ff', bg: '#11111b' }
+    { name: 'Classique', fg: '#000000', dots: 'square', cs: 'square', cd: 'square', eye: '#000000', bg: '#ffffff' },
+    { name: 'Points verts', fg: '#166534', dots: 'dots', cs: 'extra-rounded', cd: 'dot', eye: '#166534', bg: '#ffffff' },
+    { name: 'Arrondi violet', fg: '#6d28d9', dots: 'rounded', cs: 'extra-rounded', cd: 'extra-rounded', eye: '#6d28d9', bg: '#ffffff' },
+    { name: 'Dégradé élégant', grad: ['#166534', '#6d28d9', 'linear'], dots: 'classy-rounded', cs: 'extra-rounded', cd: 'classy', eye: '#166534', bg: '#ffffff' },
+    { name: 'Framboise', fg: '#c2185b', dots: 'classy', cs: 'dot', cd: 'dot', eye: '#c2185b', bg: '#ffffff' },
+    { name: 'Nuit inversée', fg: '#eeeef6', dots: 'extra-rounded', cs: 'square', cd: 'dot', eye: '#7fb3ff', bg: '#11111b' }
   ];
 
   var type = 'url', svg = '', logoURL = '', logoIcon = -1, timer, token = 0;
@@ -36,9 +40,10 @@
   var shape = { dotsType: 'square', csType: 'square', cdType: 'square' };
   var frameStyle = 'classic';
 
-  // ---- Exemples de cadre (clic = active le cadre + applique style et couleurs)
+  // ---- Exemples de cadre (clic = active le cadre + applique style et couleurs ; noir par défaut)
   var FRAMES = [
-    { name: 'Classique', style: 'classic', fcol: '#166534', tcol: '#ffffff' },
+    { name: 'Noir', style: 'classic', fcol: '#000000', tcol: '#ffffff' },
+    { name: 'Vert', style: 'classic', fcol: '#166534', tcol: '#ffffff' },
     { name: 'Texte en haut', style: 'top', fcol: '#6d28d9', tcol: '#ffffff' },
     { name: 'Ruban', style: 'ribbon', fcol: '#1e1e2f', tcol: '#ffffff' },
     { name: 'Pilule', style: 'pill', fcol: '#166534', tcol: '#ffffff' },
@@ -52,31 +57,31 @@
       '<rect x="7" y="' + (top ? 5 : 16) + '" width="10" height="3" rx="1" fill="' + ex.tcol + '"/></svg>';
   }
 
-  // ---- Vignettes de formes (glyphes SVG, viewBox 0 0 24 24, currentColor)
+  // ---- Glyphes de formes (une cellule par type, réutilisée pour modules et centre)
+  function rect(x, y, s, r) { return '<rect x="' + x + '" y="' + y + '" width="' + s + '" height="' + s + '"' + (r ? ' rx="' + r + '"' : '') + '/>'; }
+  function cell(t, x, y, s) {
+    var r2 = s / 4, r4 = s / 2;
+    if (t === 'dots') return '<circle cx="' + (x + r4) + '" cy="' + (y + r4) + '" r="' + r4 + '"/>';
+    if (t === 'rounded') return rect(x, y, s, r2);
+    if (t === 'extra-rounded') return rect(x, y, s, r4);
+    if (t === 'classy') return '<path d="M' + (x + r4) + ' ' + y + ' H' + (x + s) + ' V' + (y + s) + ' H' + x + ' V' + (y + r4) + ' A' + r4 + ' ' + r4 + ' 0 0 1 ' + (x + r4) + ' ' + y + ' Z"/>';
+    if (t === 'classy-rounded') return '<path d="M' + (x + r4) + ' ' + y + ' H' + (x + s) + ' V' + (y + r4) + ' A' + r4 + ' ' + r4 + ' 0 0 1 ' + (x + r4) + ' ' + (y + s) + ' H' + x + ' V' + (y + r4) + ' A' + r4 + ' ' + r4 + ' 0 0 1 ' + (x + r4) + ' ' + y + ' Z"/>';
+    return rect(x, y, s, 0);
+  }
   function dotGlyph(t) {
-    var cells = [[3, 3], [13, 3], [3, 13], [13, 13]], p = '';
-    cells.forEach(function (o) {
-      var x = o[0], y = o[1];
-      if (t === 'dots') p += '<circle cx="' + (x + 4) + '" cy="' + (y + 4) + '" r="4"/>';
-      else if (t === 'rounded') p += '<rect x="' + x + '" y="' + y + '" width="8" height="8" rx="2"/>';
-      else if (t === 'extra-rounded') p += '<rect x="' + x + '" y="' + y + '" width="8" height="8" rx="4"/>';
-      else if (t === 'classy') p += '<path d="M' + (x + 4) + ' ' + y + ' H' + (x + 8) + ' V' + (y + 8) + ' H' + x + ' V' + (y + 4) + ' A4 4 0 0 1 ' + (x + 4) + ' ' + y + ' Z"/>';
-      else if (t === 'classy-rounded') p += '<path d="M' + (x + 4) + ' ' + y + ' H' + (x + 8) + ' V' + (y + 4) + ' A4 4 0 0 1 ' + (x + 4) + ' ' + (y + 8) + ' H' + x + ' V' + (y + 4) + ' A4 4 0 0 1 ' + (x + 4) + ' ' + y + ' Z"/>';
-      else p += '<rect x="' + x + '" y="' + y + '" width="8" height="8"/>';
-    });
+    var p = [[3, 3], [13, 3], [3, 13], [13, 13]].map(function (o) { return cell(t, o[0], o[1], 8); }).join('');
     return '<svg viewBox="0 0 24 24" fill="currentColor">' + p + '</svg>';
   }
+  function ballGlyph(t) { return '<svg viewBox="0 0 24 24" fill="currentColor">' + cell(t, 7, 7, 10) + '</svg>'; }
   function frameGlyph(t) {
     var inner = t === 'dot' ? '<circle cx="12" cy="12" r="8"/>' : '<rect x="4" y="4" width="16" height="16" rx="' + (t === 'extra-rounded' ? 5 : 0) + '"/>';
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">' + inner + '</svg>';
   }
-  function ballGlyph(t) {
-    return '<svg viewBox="0 0 24 24" fill="currentColor">' + (t === 'dot' ? '<circle cx="12" cy="12" r="5"/>' : '<rect x="7" y="7" width="10" height="10"/>') + '</svg>';
-  }
+  var DOT_TYPES = [['square', 'Carrés'], ['dots', 'Points'], ['rounded', 'Arrondis'], ['extra-rounded', 'Très arrondis'], ['classy', 'Élégant'], ['classy-rounded', 'Élégant arrondi']];
   var SHAPES = {
-    dotsType: [['square', 'Carrés'], ['dots', 'Points'], ['rounded', 'Arrondis'], ['extra-rounded', 'Très arrondis'], ['classy', 'Élégant'], ['classy-rounded', 'Élégant arrondi']].map(function (o) { return [o[0], o[1], dotGlyph(o[0])]; }),
+    dotsType: DOT_TYPES.map(function (o) { return [o[0], o[1], dotGlyph(o[0])]; }),
     csType: [['square', 'Carré'], ['dot', 'Cercle'], ['extra-rounded', 'Arrondi']].map(function (o) { return [o[0], o[1], frameGlyph(o[0])]; }),
-    cdType: [['square', 'Carré'], ['dot', 'Point']].map(function (o) { return [o[0], o[1], ballGlyph(o[0])]; })
+    cdType: DOT_TYPES.map(function (o) { return [o[0], o[1], ballGlyph(o[0])]; })
   };
 
   // ---- Galerie d'icônes de logo (SVG au trait, sans dépendance ni réseau)
@@ -100,7 +105,11 @@
     ['Téléchargement', '<path d="M12 4v10"/><path d="M8 11l4 4 4-4"/><path d="M5 19h14"/>'],
     ['Panier', '<path d="M4 5h2l2 10h9l2-7H7.5"/><circle cx="10" cy="19" r="1.3"/><circle cx="17" cy="19" r="1.3"/>'],
     ['Message', '<path d="M4 5h16v11H9l-4 3Z"/><path d="M8 9h8M8 12h5"/>'],
-    ['Partage', '<circle cx="6" cy="12" r="2.4"/><circle cx="17" cy="6" r="2.4"/><circle cx="17" cy="18" r="2.4"/><path d="M8.2 11l6.6-4M8.2 13l6.6 4"/>']
+    ['Partage', '<circle cx="6" cy="12" r="2.4"/><circle cx="17" cy="6" r="2.4"/><circle cx="17" cy="18" r="2.4"/><path d="M8.2 11l6.6-4M8.2 13l6.6 4"/>'],
+    ['Paiement', '<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18M7 15h4"/>'],
+    ['Billet', '<path d="M4 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2 2 2 0 0 0 0 4 2 2 0 0 1-2 2H6a2 2 0 0 1-2-2 2 2 0 0 0 0-4Z"/><path d="M14 6v12"/>'],
+    ['Cadeau', '<rect x="4" y="9" width="16" height="11" rx="1"/><path d="M4 13h16M12 9v11M8.5 9a2.5 2.5 0 1 1 3.5-2.3A2.5 2.5 0 1 1 15.5 9"/>'],
+    ['Horloge', '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>']
   ];
   function iconURL(inner, color) {
     return 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="' + color + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + inner + '</svg>');
@@ -112,6 +121,7 @@
     Object.keys(TYPES).forEach(function (k) {
       var b = document.createElement('button');
       b.type = 'button'; b.textContent = TYPES[k].label; b.className = k === type ? 'on' : '';
+      b.setAttribute('aria-pressed', k === type);
       b.onclick = function () { type = k; renderTabs(); renderFields(); update(); };
       $('tabs').appendChild(b);
     });
@@ -140,26 +150,49 @@
     ['fg-grad-1', 'fg-grad-2', 'fg-grad-type'].forEach(function (id) { $(id).hidden = !grad; });
   }
 
+  // ---- Champs couleur : rangée de swatches + pinceau (choix personnalisé)
+  function enhanceColors() {
+    ['fg', 'g1', 'g2', 'bgcol', 'csColor', 'cdColor', 'logoColor', 'frameColor', 'frameTextColor'].forEach(function (id) {
+      var inp = $(id); if (!inp || inp.dataset.enh) return; inp.dataset.enh = 1;
+      var wrap = document.createElement('span'); wrap.className = 'colorfield';
+      inp.parentNode.insertBefore(wrap, inp);
+      COLORS.forEach(function (c) {
+        var s = document.createElement('button'); s.type = 'button'; s.className = 'swatch'; s.style.background = c; s.title = c;
+        s.setAttribute('aria-label', 'Couleur ' + c);
+        s.onclick = function () { inp.value = c; inp.dispatchEvent(new Event('input', { bubbles: true })); };
+        wrap.appendChild(s);
+      });
+      var brush = document.createElement('button'); brush.type = 'button'; brush.className = 'brush'; brush.innerHTML = BRUSH;
+      brush.title = 'Couleur personnalisée'; brush.setAttribute('aria-label', 'Choisir une couleur personnalisée');
+      brush.style.setProperty('--c', inp.value);
+      brush.onclick = function () { inp.click(); };
+      inp.classList.add('sr-only');
+      inp.addEventListener('input', function () { brush.style.setProperty('--c', inp.value); });
+      wrap.appendChild(brush); wrap.appendChild(inp);
+    });
+  }
+
   function renderPresets() {
     PRESETS.forEach(function (p, idx) {
       var b = document.createElement('button');
       b.type = 'button'; b.title = p.name; b.setAttribute('aria-label', 'Modèle ' + p.name);
       var fg = p.grad ? 'url(#g' + idx + ')' : p.fg;
       var def = p.grad ? '<defs><linearGradient id="g' + idx + '"><stop offset="0" stop-color="' + p.grad[0] + '"/><stop offset="1" stop-color="' + p.grad[1] + '"/></linearGradient></defs>' : '';
+      var fr = p.cs === 'dot' ? '<circle cx="{cx}" cy="{cy}" r="5.5" fill="none" stroke="' + p.eye + '" stroke-width="3"/>'
+        : '<rect x="{x}" y="{y}" width="11" height="11" rx="' + (p.cs === 'extra-rounded' ? 4 : 1) + '" fill="none" stroke="' + p.eye + '" stroke-width="3"/>';
+      function frame(x, y) { return fr.replace('{x}', x).replace('{y}', y).replace('{cx}', x + 5.5).replace('{cy}', y + 5.5); }
+      var dots = '<g fill="' + fg + '">' + [[24, 24], [31, 24], [24, 31], [31, 31]].map(function (o) { return cell(p.dots, o[0], o[1], 4); }).join('') + '</g>';
       b.innerHTML = '<svg viewBox="0 0 40 40">' + def + '<rect width="40" height="40" fill="' + p.bg + '"/>' +
-        '<rect x="5" y="5" width="11" height="11" rx="2" fill="none" stroke="' + p.eye + '" stroke-width="3"/>' +
-        '<rect x="24" y="5" width="11" height="11" rx="2" fill="none" stroke="' + p.eye + '" stroke-width="3"/>' +
-        '<rect x="5" y="24" width="11" height="11" rx="2" fill="none" stroke="' + p.eye + '" stroke-width="3"/>' +
-        '<g fill="' + fg + '"><rect x="24" y="24" width="4" height="4"/><rect x="31" y="24" width="4" height="4"/><rect x="24" y="31" width="4" height="4"/><rect x="31" y="31" width="4" height="4"/></g></svg>';
+        frame(5, 5) + frame(24, 5) + frame(5, 24) + dots + '</svg>';
       b.onclick = function () { applyPreset(p); };
       $('presets').appendChild(b);
     });
   }
   function applyPreset(p) {
-    if (p.grad) { document.querySelector('input[name=fgmode][value=gradient]').checked = true; $('g1').value = p.grad[0]; $('g2').value = p.grad[1]; $('gradType').value = p.grad[2]; }
-    else { document.querySelector('input[name=fgmode][value=single]').checked = true; $('fg').value = p.fg; }
+    if (p.grad) { document.querySelector('input[name=fgmode][value=gradient]').checked = true; setVal('g1', p.grad[0]); setVal('g2', p.grad[1]); $('gradType').value = p.grad[2]; }
+    else { document.querySelector('input[name=fgmode][value=single]').checked = true; setVal('fg', p.fg); }
     shape.dotsType = p.dots; shape.csType = p.cs; shape.cdType = p.cd; markShapes();
-    $('csColor').value = p.eye; $('cdColor').value = p.eye; $('bgcol').value = p.bg;
+    setVal('csColor', p.eye); setVal('cdColor', p.eye); setVal('bgcol', p.bg);
     syncFgMode(); update();
   }
 
@@ -179,7 +212,7 @@
   }
   function markShapes() {
     Object.keys(SHAPES).forEach(function (id) {
-      $(id).querySelectorAll('button').forEach(function (b) { b.classList.toggle('on', b.dataset.val === shape[id]); });
+      $(id).querySelectorAll('button').forEach(function (b) { var on = b.dataset.val === shape[id]; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
     });
   }
 
@@ -196,7 +229,7 @@
     grid.style.color = $('logoColor').value;
   }
   function markIcons() {
-    $('icongrid').querySelectorAll('button').forEach(function (b, i) { b.classList.toggle('on', i === logoIcon); });
+    $('icongrid').querySelectorAll('button').forEach(function (b, i) { var on = i === logoIcon; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
     $('logoClear').hidden = !logoURL;
   }
   function selectIcon(i) {
@@ -217,13 +250,13 @@
   }
   function markFrames() {
     $('frameStyle').querySelectorAll('button').forEach(function (b) {
-      var ex = FRAMES[b.dataset.i];
-      b.classList.toggle('on', $('frameOn').checked && ex.style === frameStyle && ex.fcol === $('frameColor').value);
+      var ex = FRAMES[b.dataset.i], on = $('frameOn').checked && ex.style === frameStyle && ex.fcol === $('frameColor').value;
+      b.classList.toggle('on', on); b.setAttribute('aria-pressed', on);
     });
   }
   function applyFrame(ex) {
     $('frameOn').checked = true; $('frameOpts').hidden = false;
-    frameStyle = ex.style; $('frameColor').value = ex.fcol; $('frameTextColor').value = ex.tcol;
+    frameStyle = ex.style; setVal('frameColor', ex.fcol); setVal('frameTextColor', ex.tcol);
     markFrames(); update();
   }
   // Emballe le QR (svg 300x300) dans un cadre coloré avec un bandeau de texte
@@ -251,12 +284,12 @@
       dotsOptions: dots,
       cornersSquareOptions: { type: shape.csType, color: $('csColor').value },
       cornersDotOptions: { type: shape.cdType, color: $('cdColor').value },
-      backgroundOptions: { color: $('bgcol').value }
+      backgroundOptions: { color: $('transparent').checked ? 'transparent' : $('bgcol').value }
     };
     if (logoURL) { o.image = logoURL; o.imageOptions = { margin: 3, imageSize: LOGO_SIZE, hideBackgroundDots: true }; }
     return o;
   }
-  // Construit le SVG (source unique). La légende éventuelle est ajoutée sous le QR.
+  // Construit le SVG (source unique). Légende ou cadre ajoutés ensuite.
   function buildSVG(data, withCaption) {
     var q = new QRCodeStyling(qrOptions(data));
     return q.getRawData('svg').then(function (blob) { return blob.text(); }).then(function (s) {
@@ -264,7 +297,8 @@
       if ($('frameOn').checked) return framed(s, text || 'SCANNEZ-MOI');
       var cap = withCaption ? text : '';
       if (cap) {
-        var col = fgMode() === 'gradient' ? $('g1').value : $('fg').value, bg = $('bgcol').value;
+        var col = fgMode() === 'gradient' ? $('g1').value : $('fg').value;
+        var bg = $('transparent').checked ? 'transparent' : $('bgcol').value;
         s = s.replace(/viewBox="0 0 300 300"/, 'viewBox="0 0 300 334"').replace(/height="300"/, 'height="334"'); // 1re occurrence = balise <svg>
         s = s.replace('</svg>', '<rect x="0" y="300" width="300" height="34" fill="' + bg + '"/>' +
           '<text x="150" y="323" font-family="Marianne, system-ui, sans-serif" font-size="17" font-weight="700" text-anchor="middle" fill="' + col + '">' + xml(cap) + '</text></svg>');
@@ -286,6 +320,20 @@
       if (my !== token) return;
       svg = ''; setButtons(false); $('out').innerHTML = '<p class="out-empty">Contenu trop long pour un QR code.</p>';
     });
+  }
+
+  // ---- Réinitialiser l'apparence
+  function setVal(id, v) { var e = $(id); if (e) { e.value = v; e.dispatchEvent(new Event('input')); } }   // non-bulle : met à jour le pinceau sans relancer update
+  function reset() {
+    document.querySelector('input[name=fgmode][value=single]').checked = true; syncFgMode();
+    setVal('fg', '#166534'); setVal('bgcol', '#ffffff'); setVal('csColor', '#166534'); setVal('cdColor', '#166534');
+    setVal('logoColor', '#166534'); setVal('g1', '#166534'); setVal('g2', '#6d28d9'); $('gradType').value = 'linear';
+    shape = { dotsType: 'square', csType: 'square', cdType: 'square' }; markShapes();
+    logoURL = ''; logoIcon = -1; $('logo').value = ''; markIcons();
+    $('frameOn').checked = false; $('frameOpts').hidden = true; frameStyle = 'classic'; setVal('frameColor', '#000000'); setVal('frameTextColor', '#ffffff'); markFrames();
+    $('caption').value = ''; $('transparent').checked = false; $('ec').value = 'M';
+    $('size').value = 1024; $('sizeVal').textContent = '1024';
+    update();
   }
 
   // ======================= Export =======================
@@ -313,11 +361,13 @@
       navigator.clipboard.write([new ClipboardItem({ 'image/png': b })]).then(function () { say('Copié !'); }, function () { say('Copie impossible, utilisez PNG.'); });
     }, 512);
   };
-  $('print').onclick = function () {
-    var w = window.open('', '_blank');
-    if (!w) return say('Autorisez les pop-ups pour imprimer.');
-    w.document.write('<title>QR code</title><body style="margin:0;display:grid;place-items:center;height:100vh">' + svg.replace('<svg ', '<svg style="width:80vmin" ') + '</body>');
-    w.document.close(); w.focus(); w.print();
+  $('print').onclick = function () {   // iframe caché : pas de pop-up à autoriser
+    var f = document.createElement('iframe'); f.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0';
+    document.body.appendChild(f);
+    var d = f.contentWindow.document;
+    d.write('<title>QR code</title><body style="margin:0;display:grid;place-items:center;height:100vh">' + svg.replace('<svg ', '<svg style="width:80vmin" ') + '</body>');
+    d.close();
+    setTimeout(function () { f.contentWindow.focus(); f.contentWindow.print(); setTimeout(function () { f.remove(); }, 1000); }, 150);
   };
 
   $('logoUpload').onclick = function () { $('logo').click(); };
@@ -378,7 +428,9 @@
   $('fg-mode').addEventListener('change', syncFgMode);
   $('frameOn').addEventListener('change', function () { $('frameOpts').hidden = !this.checked; markFrames(); update(); });
   $('frameColor').addEventListener('input', markFrames);
+  $('resetBtn').addEventListener('click', reset);
   $('tabs').closest('.panel').addEventListener('input', function () { clearTimeout(timer); timer = setTimeout(update, 120); });
 
+  enhanceColors();
   renderTabs(); renderFields(); renderPresets(); renderShapes(); renderIcons(); renderFrames(); update();
 })();

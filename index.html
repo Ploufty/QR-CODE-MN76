@@ -18,11 +18,7 @@
 <body>
   <a class="skip" href="#main">Aller au contenu</a>
 
-  <div class="bg" aria-hidden="true">
-    <div class="layer layer-a"><span class="blob blob-a"></span></div>
-    <div class="layer layer-b"><span class="blob blob-b"></span></div>
-    <div class="layer layer-c"><span class="dots"></span></div>
-  </div>
+  <div class="bg" aria-hidden="true"><canvas id="bgcanvas"></canvas></div>
 
   <header>
     <div class="brandbar container">
@@ -62,67 +58,83 @@
         <div class="typetabs" id="tabs" role="tablist" aria-label="Type de QR code"></div>
         <div id="fields" class="fields"></div>
 
-        <details class="block">
+        <details class="block" open>
           <summary>Personnaliser l'apparence</summary>
 
-          <p class="sublabel">Modèles rapides</p>
-          <div class="presets" id="presets"></div>
-
-          <div class="opts">
-            <label class="wide">Couleur des modules
-              <span class="seg mini" id="fg-mode">
-                <label><input type="radio" name="fgmode" value="single" checked><span>Unie</span></label>
-                <label><input type="radio" name="fgmode" value="gradient"><span>Dégradé</span></label>
-              </span>
-            </label>
-
-            <label id="fg-single-1">Couleur <input type="color" id="fg" value="#166534"></label>
-            <label id="fg-grad-1" hidden>Début du dégradé <input type="color" id="g1" value="#166534"></label>
-            <label id="fg-grad-2" hidden>Fin du dégradé <input type="color" id="g2" value="#00727a"></label>
-            <label id="fg-grad-type" hidden>Type de dégradé
-              <select id="gradType"><option value="linear">Linéaire</option><option value="radial">Radial</option></select>
-            </label>
-
-            <div class="wide pickwrap"><span class="picklabel">Style des modules</span>
-              <div class="shapes" id="dotsType" role="group" aria-label="Style des modules"></div>
+          <div class="custom-head">
+            <div>
+              <p class="sublabel">Modèles rapides</p>
+              <div class="presets" id="presets"></div>
             </div>
-            <div class="wide pickwrap"><span class="picklabel">Contour des marqueurs</span>
-              <div class="shapes" id="csType" role="group" aria-label="Contour des marqueurs"></div>
-            </div>
-            <div class="wide pickwrap"><span class="picklabel">Centre des marqueurs</span>
-              <div class="shapes" id="cdType" role="group" aria-label="Centre des marqueurs"></div>
-            </div>
-
-            <label>Couleur du fond <input type="color" id="bgcol" value="#ffffff"></label>
-            <label>Couleur du contour <input type="color" id="csColor" value="#166534"></label>
-            <label>Couleur du centre <input type="color" id="cdColor" value="#166534"></label>
-            <label>Correction d'erreur
-              <select id="ec"><option value="L">Basse</option><option value="M" selected>Moyenne</option><option value="Q">Haute</option><option value="H">Maximale</option></select>
-            </label>
-
-            <div class="wide pickwrap"><span class="picklabel">Logo au centre (optionnel)</span>
-              <div class="icongrid" id="icongrid" role="group" aria-label="Icônes de logo"></div>
-              <div class="logo-tools">
-                <button type="button" id="logoUpload" class="btn btn-ghost">Importer une image…</button>
-                <input type="file" id="logo" accept="image/*" class="sr-only">
-                <label class="logo-color">Couleur <input type="color" id="logoColor" value="#166534"></label>
-                <button type="button" id="logoClear" class="btn btn-ghost" hidden>Retirer</button>
-              </div>
-            </div>
-            <label class="wide">Texte sous le QR / du cadre (optionnel)
-              <input type="text" id="caption" maxlength="40" placeholder="Scannez-moi">
-            </label>
-
-            <div class="wide pickwrap">
-              <label class="switch frame-switch"><input type="checkbox" id="frameOn"><span>Encadrer le QR (cadre + texte)</span></label>
-              <span class="picklabel">Exemples de cadre (un clic active le cadre)</span>
-              <div class="shapes" id="frameStyle" role="group" aria-label="Exemples de cadre"></div>
-              <div id="frameOpts" class="opts" hidden>
-                <label>Couleur du cadre <input type="color" id="frameColor" value="#166534"></label>
-                <label>Couleur du texte <input type="color" id="frameTextColor" value="#ffffff"></label>
-              </div>
-            </div>
+            <button type="button" id="resetBtn" class="btn btn-ghost reset-btn" title="Revenir aux réglages par défaut">↺ Réinitialiser</button>
           </div>
+
+          <details class="sub" open>
+            <summary>Modules &amp; couleurs</summary>
+            <div class="opts">
+              <label class="wide">Couleur des modules
+                <span class="seg mini" id="fg-mode">
+                  <label><input type="radio" name="fgmode" value="single" checked><span>Unie</span></label>
+                  <label><input type="radio" name="fgmode" value="gradient"><span>Dégradé</span></label>
+                </span>
+              </label>
+              <label class="wide" id="fg-single-1">Couleur <input type="color" id="fg" value="#166534"></label>
+              <label class="wide" id="fg-grad-1" hidden>Début du dégradé <input type="color" id="g1" value="#166534"></label>
+              <label class="wide" id="fg-grad-2" hidden>Fin du dégradé <input type="color" id="g2" value="#6d28d9"></label>
+              <label id="fg-grad-type" hidden>Type de dégradé
+                <select id="gradType"><option value="linear">Linéaire</option><option value="radial">Radial</option></select>
+              </label>
+              <div class="wide pickwrap"><span class="picklabel">Style des modules</span>
+                <div class="shapes" id="dotsType" role="group" aria-label="Style des modules"></div>
+              </div>
+              <label class="wide">Couleur du fond <input type="color" id="bgcol" value="#ffffff"></label>
+              <label class="switch wide"><input type="checkbox" id="transparent"><span>Fond transparent (export PNG/SVG)</span></label>
+              <label>Correction d'erreur
+                <select id="ec"><option value="L">Basse</option><option value="M" selected>Moyenne</option><option value="Q">Haute</option><option value="H">Maximale</option></select>
+              </label>
+            </div>
+          </details>
+
+          <details class="sub">
+            <summary>Marqueurs des coins</summary>
+            <div class="opts">
+              <div class="wide pickwrap"><span class="picklabel">Contour</span>
+                <div class="shapes" id="csType" role="group" aria-label="Contour des marqueurs"></div>
+              </div>
+              <label class="wide">Couleur du contour <input type="color" id="csColor" value="#166534"></label>
+              <div class="wide pickwrap"><span class="picklabel">Centre</span>
+                <div class="shapes" id="cdType" role="group" aria-label="Centre des marqueurs"></div>
+              </div>
+              <label class="wide">Couleur du centre <input type="color" id="cdColor" value="#166534"></label>
+            </div>
+          </details>
+
+          <details class="sub">
+            <summary>Logo au centre</summary>
+            <div class="icongrid" id="icongrid" role="group" aria-label="Icônes de logo"></div>
+            <div class="logo-tools">
+              <button type="button" id="logoUpload" class="btn btn-ghost">Importer une image…</button>
+              <input type="file" id="logo" accept="image/*" class="sr-only">
+              <label class="logo-color">Couleur <input type="color" id="logoColor" value="#166534"></label>
+              <button type="button" id="logoClear" class="btn btn-ghost" hidden>Retirer</button>
+            </div>
+          </details>
+
+          <details class="sub">
+            <summary>Cadre &amp; texte</summary>
+            <div class="opts">
+              <label class="wide">Texte sous le QR / du cadre
+                <input type="text" id="caption" maxlength="40" placeholder="Scannez-moi">
+              </label>
+            </div>
+            <label class="switch frame-switch"><input type="checkbox" id="frameOn"><span>Encadrer le QR</span></label>
+            <p class="hint-sm">Le cadre réutilise le texte ci-dessus. Un clic sur un exemple active le cadre.</p>
+            <div class="shapes" id="frameStyle" role="group" aria-label="Exemples de cadre"></div>
+            <div id="frameOpts" class="opts" hidden>
+              <label class="wide">Couleur du cadre <input type="color" id="frameColor" value="#000000"></label>
+              <label class="wide">Couleur du texte <input type="color" id="frameTextColor" value="#ffffff"></label>
+            </div>
+          </details>
         </details>
 
         <details class="block" id="batch">
