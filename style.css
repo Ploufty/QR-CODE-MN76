@@ -345,3 +345,25 @@ legend { margin-bottom: .5rem; font-size: .9rem; font-weight: 700; }
 .tool { align-items: start; }
 .preview { position: sticky; top: .8rem; align-self: start; }
 @media (max-width: 860px) { .preview { position: static; } }
+
+/* ===== v9 : navigation, centrage boutons, typographie (charte Marianne) ===== */
+/* Navigation par type : centrée, cible tactile 44px, actif renforcé */
+.typetabs { justify-content: center; gap: .45rem; }
+.typetabs button { min-height: 2.75rem; font-size: .95rem; }
+.typetabs button.on { box-shadow: 0 6px 14px -6px color-mix(in srgb, var(--primaire) 55%, transparent); }
+
+/* Titres de section centrés + hiérarchie */
+.cat-head-lite { text-align: center; letter-spacing: -.01em; }
+
+/* Groupes centrés : modèles, formes, icônes, choix de fond, actions */
+.presets, .shapes { justify-content: center; }
+.icongrid { justify-content: center; }
+.seg.mini, .bg-choice { margin-inline: auto; }
+.bg-label { text-align: center; }
+.tool-actions { max-width: 26rem; margin-inline: auto; }
+.preview .size, .preview .fname { text-align: center; }
+.preview .size input, .preview .fname input { margin-inline: auto; }
+
+/* Lisibilité des libellés et boutons */
+.btn, .icon-btn { font-size: .95rem; }
+.picklabel, .sublabel { letter-spacing: .01em; font-weight: 700; }
