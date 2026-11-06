@@ -156,8 +156,9 @@
   var cmenu = null, cmenuInput = null;
   function closeColorMenu() {
     if (!cmenu) return;
+    var chip = cmenuInput && cmenuInput._chip, inside = cmenu.contains(document.activeElement);
     cmenu.hidden = true;
-    if (cmenuInput) { var c = cmenuInput._chip; if (c) c.setAttribute('aria-expanded', 'false'); }
+    if (chip) { chip.setAttribute('aria-expanded', 'false'); if (inside) chip.focus(); }   // clavier : on rend le focus au bouton
     cmenuInput = null;
   }
   function buildColorMenu() {
@@ -341,7 +342,9 @@
       if (cap) {
         var col = fgMode() === 'gradient' ? $('g1').value : $('fg').value;
         var bg = transparentOn() ? 'transparent' : $('bgcol').value;
-        s = s.replace(/viewBox="0 0 300 300"/, 'viewBox="0 0 300 334"').replace(/height="300"/, 'height="334"'); // 1re occurrence = balise <svg>
+        s = s.replace(/<svg[^>]*>/, function (tag) {   // on ne touche que la balise racine, pas un élément interne
+          return tag.replace('height="300"', 'height="334"').replace('viewBox="0 0 300 300"', 'viewBox="0 0 300 334"');
+        });
         s = s.replace('</svg>', '<rect x="0" y="300" width="300" height="34" fill="' + bg + '"/>' +
           '<text x="150" y="323" font-family="Marianne, system-ui, sans-serif" font-size="17" font-weight="700" text-anchor="middle" fill="' + col + '">' + xml(cap) + '</text></svg>');
       }

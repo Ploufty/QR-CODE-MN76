@@ -25,5 +25,5 @@ self.addEventListener('fetch', e => {
   e.respondWith(caches.match(req).then(r => r || fetch(req).then(res => {
     if (res.ok && (res.type === 'basic' || res.type === 'cors')) { const cl = res.clone(); caches.open(CACHE).then(c => c.put(req, cl)); }
     return res;
-  }).catch(() => r)));
+  })));
 });
