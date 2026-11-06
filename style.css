@@ -326,8 +326,8 @@ legend { margin-bottom: .5rem; font-size: .9rem; font-weight: 700; }
 /* Champs couleur : une pastille ronde -> menu palette */
 .colorfield { display: inline-flex; align-items: center; gap: .4rem; margin-top: .4rem; }
 .colorchip {
-  display: inline-flex; align-items: center; gap: .4rem;
-  min-height: 2.75rem; padding: .3rem .55rem .3rem .35rem; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: space-between; gap: .5rem;
+  min-height: 2.75rem; min-width: 6.5rem; padding: .3rem .75rem .3rem .4rem; cursor: pointer;
   border: 1.5px solid var(--border); border-radius: 999px; background: var(--surface);
   transition: border-color .2s, box-shadow .2s, transform .15s var(--spring);
 }
