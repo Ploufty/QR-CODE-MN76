@@ -78,7 +78,7 @@
                   <label><input type="radio" name="fgmode" value="gradient"><span>Dégradé</span></label>
                 </span>
               </label>
-              <label class="wide" id="fg-single-1">Couleur <input type="color" id="fg" value="#166534"></label>
+              <label class="wide" id="fg-single-1">Couleur <input type="color" id="fg" value="#000000"></label>
               <label class="wide" id="fg-grad-1" hidden>Début du dégradé <input type="color" id="g1" value="#166534"></label>
               <label class="wide" id="fg-grad-2" hidden>Fin du dégradé <input type="color" id="g2" value="#6d28d9"></label>
               <label id="fg-grad-type" hidden>Type de dégradé
@@ -88,9 +88,14 @@
                 <div class="shapes" id="dotsType" role="group" aria-label="Style des modules"></div>
               </div>
               <label class="wide">Couleur du fond <input type="color" id="bgcol" value="#ffffff"></label>
-              <label>Correction d'erreur
+              <div class="wide">
+                <span class="picklabel label-row">
+                  <label for="ec">Correction d'erreur</label>
+                  <button type="button" class="hint-btn" id="ecHintBtn" aria-expanded="false" aria-controls="ecHint" aria-label="À quoi sert la correction d'erreur ?">?</button>
+                </span>
                 <select id="ec"><option value="L">Basse</option><option value="M" selected>Moyenne</option><option value="Q">Haute</option><option value="H">Maximale</option></select>
-              </label>
+                <p class="field-hint" id="ecHint" hidden>La correction d'erreur ajoute des données de secours à l'intérieur du QR code pour qu'un scanner puisse le lire parfaitement même s'il est déchiré, taché ou masqué par un logo.</p>
+              </div>
             </div>
           </details>
 
@@ -100,11 +105,11 @@
               <div class="wide pickwrap"><span class="picklabel">Contour</span>
                 <div class="shapes" id="csType" role="group" aria-label="Contour des marqueurs"></div>
               </div>
-              <label class="wide">Couleur du contour <input type="color" id="csColor" value="#166534"></label>
+              <label class="wide">Couleur du contour <input type="color" id="csColor" value="#000000"></label>
               <div class="wide pickwrap"><span class="picklabel">Centre</span>
                 <div class="shapes" id="cdType" role="group" aria-label="Centre des marqueurs"></div>
               </div>
-              <label class="wide">Couleur du centre <input type="color" id="cdColor" value="#166534"></label>
+              <label class="wide">Couleur du centre <input type="color" id="cdColor" value="#000000"></label>
             </div>
           </details>
 
@@ -114,7 +119,7 @@
             <div class="logo-tools">
               <button type="button" id="logoUpload" class="btn btn-ghost">Importer une image…</button>
               <input type="file" id="logo" accept="image/*" class="sr-only">
-              <label class="logo-color">Couleur <input type="color" id="logoColor" value="#166534"></label>
+              <label class="logo-color">Couleur <input type="color" id="logoColor" value="#000000"></label>
               <button type="button" id="logoClear" class="btn btn-ghost" hidden>Retirer</button>
             </div>
           </details>
@@ -186,41 +191,97 @@
         </button>
       </div>
       <div class="help">
-        <details open><summary>Créer un QR code</summary>
-          <ol><li>Choisissez un type : Lien, Texte, Wi-Fi, Contact, E-mail ou Téléphone.</li>
-          <li>Remplissez les champs : l'aperçu se met à jour tout seul.</li>
-          <li>Testez-le avec un téléphone avant de l'imprimer ou de le diffuser.</li></ol></details>
-        <details><summary>Les types de QR code</summary>
-          <ul><li><b>Lien</b> : ouvre un site (le <code>https://</code> est ajouté si oublié).</li>
-          <li><b>Texte</b> : affiche un message libre.</li>
-          <li><b>Wi-Fi</b> : le téléphone propose de se connecter au réseau, sans saisir le mot de passe.</li>
-          <li><b>Contact</b> : ajoute une fiche (nom, société, téléphone, e-mail) au répertoire.</li>
-          <li><b>E-mail</b> : ouvre un message pré-rempli. <b>Téléphone</b> : lance l'appel.</li></ul></details>
-        <details><summary>Personnaliser</summary>
-          <ul><li><b>Modèles rapides</b> : cliquez une vignette pour appliquer une combinaison couleurs + style. <b>↺ Réinitialiser</b> remet les réglages par défaut.</li>
-          <li><b>Couleurs</b> : cliquez une pastille, ou le <b>pinceau</b> pour une couleur libre.</li>
-          <li><b>Couleur des modules</b> : unie, ou <b>dégradé</b> (linéaire/radial) entre deux couleurs. Gardez un fort contraste avec le fond.</li>
-          <li><b>Style des modules</b> et <b>marqueurs</b> (contour et centre) : cliquez les vignettes pour choisir la forme ; couleurs réglables séparément.</li>
-          <li><b>Correction d'erreur</b> : plus elle est haute, plus le QR résiste aux dégâts, mais plus il est dense.</li>
-          <li><b>Logo</b> : choisissez une <b>icône</b> de la galerie (couleur réglable) ou <b>importez votre image</b>. Elle se place au centre (correction forcée au maximum) ; vérifiez toujours le scan.</li>
-          <li><b>Texte sous le QR</b> : légende de 40 caractères maximum.</li>
-          <li><b>Cadre</b> : encadrez le QR avec un bandeau de texte. 5 exemples prêts à cliquer, couleurs du cadre et du texte réglables ; le texte est celui du champ ci-dessus.</li>
-          <li><b>Taille du PNG</b> : curseur côté aperçu, de 256 à 2048 px (impression grand format).</li></ul></details>
+        <details open><summary>Démarrage rapide</summary>
+          <ol><li>Choisissez le <b>type</b> de contenu en haut (Lien, Texte, Wi-Fi, Contact, E-mail, Téléphone).</li>
+          <li>Remplissez les champs : <b>l'aperçu se met à jour tout seul</b>, rien à valider.</li>
+          <li>Facultatif : ouvrez <b>Personnaliser l'apparence</b> pour les couleurs, formes, logo ou cadre.</li>
+          <li>Choisissez <b>Avec fond</b> ou <b>Transparent</b>, le nom du fichier, puis <b>Télécharger le PNG</b> (ou SVG).</li>
+          <li><b>Testez-le toujours avec un téléphone</b> avant d'imprimer ou de diffuser.</li></ol>
+          <p>Par défaut l'outil produit un QR code classique (noir sur blanc) : le plus lisible par tous les scanners.</p></details>
+
+        <details><summary>Qu'est-ce qu'un QR code ?</summary>
+          <p>Un QR code est une image qui contient du texte. Quand on le scanne avec l'appareil photo d'un téléphone, celui-ci lit ce texte et propose l'action correspondante : ouvrir un site, enregistrer un contact, se connecter au Wi-Fi…</p>
+          <p>Les QR codes créés ici sont <b>statiques</b> : le contenu est inscrit dans l'image. Il n'expire jamais, fonctionne sans limite de scans et sans connexion à un service tiers — mais <b>il ne peut pas être modifié après impression</b>. Vérifiez bien vos informations avant de diffuser.</p>
+          <p>Les trois gros carrés dans les coins sont les <b>marqueurs</b> : ils servent au scanner à repérer et redresser le code.</p></details>
+
+        <details><summary>Les types de contenu</summary>
+          <ul><li><b>Lien</b> : ouvre un site web. Le <code>https://</code> est ajouté automatiquement si vous l'oubliez.</li>
+          <li><b>Texte</b> : affiche un message libre (consigne, énigme, mot de passe d'une activité…).</li>
+          <li><b>Wi-Fi</b> : le téléphone propose de rejoindre le réseau sans taper le mot de passe. Renseignez le nom exact du réseau (SSID), le mot de passe et le type de sécurité (WPA dans la plupart des cas).</li>
+          <li><b>Contact</b> : crée une fiche (nom, société, téléphone, e-mail) que le téléphone propose d'enregistrer dans le répertoire.</li>
+          <li><b>E-mail</b> : ouvre un nouveau message déjà rempli (destinataire, objet, corps).</li>
+          <li><b>Téléphone</b> : prépare l'appel du numéro indiqué.</li></ul>
+          <p>Conseil : plus le contenu est court, moins le QR est dense, donc plus il se scanne facilement et de loin.</p></details>
+
+        <details><summary>Personnaliser l'apparence</summary>
+          <ul><li><b>Modèles rapides</b> : cliquez une vignette pour appliquer d'un coup une combinaison couleurs + formes. La première est le style classique. <b>↺ Réinitialiser</b> remet tous les réglages par défaut.</li>
+          <li><b>Couleurs</b> : cliquez la pastille ronde d'un réglage pour ouvrir la palette, puis une couleur, ou <b>Couleur libre…</b> pour la choisir vous-même.</li>
+          <li><b>Modules</b> : les petits carrés qui composent le code. Couleur <b>unie</b> ou <b>dégradé</b> (linéaire ou radial), et six formes au choix.</li>
+          <li><b>Marqueurs des coins</b> : le <b>contour</b> et le <b>centre</b> se règlent séparément, en forme et en couleur.</li>
+          <li><b>Correction d'erreur</b> : voir la section dédiée plus bas.</li></ul>
+          <p>Règle d'or : gardez un <b>fort contraste</b>, code foncé sur fond clair. Un code clair sur fond foncé fonctionne sur beaucoup de téléphones, mais pas sur tous.</p></details>
+
+        <details><summary>Logo au centre</summary>
+          <ul><li>Choisissez une <b>icône</b> de la galerie (24 icônes, couleur réglable) ou <b>importez votre image</b> (PNG, JPG, SVG).</li>
+          <li>Dès qu'un logo est présent, la correction d'erreur passe automatiquement au <b>maximum</b> pour compenser la zone masquée.</li>
+          <li><b>Retirer</b> enlève le logo.</li></ul>
+          <p>Un logo masque une partie du code : testez systématiquement le scan après l'avoir ajouté, et évitez les images très détaillées ou très claires.</p></details>
+
+        <details><summary>Cadre avec texte</summary>
+          <ul><li>Cochez <b>Encadrer le QR</b>, ou cliquez directement un des exemples (un clic active le cadre).</li>
+          <li>Le texte affiché est celui du champ <b>Texte sous le QR / du cadre</b> (40 caractères max). Sans texte saisi, « SCANNEZ-MOI » s'affiche.</li>
+          <li>Les couleurs du cadre et du texte sont réglables.</li>
+          <li>Un cadre a toujours sa couleur comme fond : pour un export réellement transparent, n'utilisez pas de cadre.</li></ul>
+          <p>Un cadre avec une consigne courte augmente nettement le nombre de scans sur une affiche.</p></details>
+
+        <details><summary>Correction d'erreur</summary>
+          <p>La correction d'erreur ajoute des données de secours à l'intérieur du QR code pour qu'un scanner puisse le lire parfaitement même s'il est déchiré, taché ou masqué par un logo.</p>
+          <ul><li><b>Basse</b> (~7 % récupérable) : code le moins dense, à réserver aux contenus courts sur support protégé.</li>
+          <li><b>Moyenne</b> (~15 %) : réglage par défaut, bon compromis.</li>
+          <li><b>Haute</b> (~25 %) : affichage extérieur, surface exposée aux salissures.</li>
+          <li><b>Maximale</b> (~30 %) : imposé automatiquement avec un logo.</li></ul>
+          <p>Plus la correction est haute, plus le code contient de modules : il devient plus dense, donc à imprimer un peu plus grand.</p></details>
+
         <details><summary>Exporter</summary>
-          <ul><li><b>PNG</b> : image pour documents et écrans. <b>SVG</b> : vectoriel, idéal pour l'impression grand format.</li>
-          <li><b>Copier</b> : place l'image dans le presse-papiers. <b>Imprimer</b> : ouvre la boîte d'impression.</li>
-          <li>Le champ « Nom du fichier » définit le nom des téléchargements.</li>
-          <li><b>Fond</b> : choisissez « Avec fond » (couleur choisie) ou « Transparent » avant l'export PNG/SVG.</li></ul></details>
+          <ul><li><b>PNG</b> : image classique, pour un document, un diaporama ou un écran. Réglez la <b>taille</b> avec le curseur (256 à 2048 px) : plus c'est grand, meilleure est l'impression.</li>
+          <li><b>SVG</b> : image vectorielle, agrandissable à l'infini sans perte. À privilégier pour l'imprimeur et les grands formats (affiche, kakémono).</li>
+          <li><b>Copier</b> : place l'image dans le presse-papiers pour la coller directement dans un document.</li>
+          <li><b>Imprimer</b> : ouvre la boîte d'impression avec le code seul, centré sur la page.</li>
+          <li><b>Fond</b> : <b>Avec fond</b> utilise la couleur de fond choisie (blanc par défaut) ; <b>Transparent</b> supprime le fond, utile pour poser le code sur une image ou un aplat de couleur.</li>
+          <li>Le champ <b>Nom du fichier</b> définit le nom de tous les téléchargements.</li></ul></details>
+
         <details><summary>Génération en lot</summary>
-          <p>Saisissez une ligne par QR code au format <code>contenu;nom</code>. Vous pouvez aussi coller depuis un tableur (colonnes séparées par une tabulation) ou importer un .csv. Maximum 200 lignes. Le ZIP contient chaque QR en PNG et SVG, avec les couleurs et le style choisis ci-dessus.</p>
+          <p>Pour créer plusieurs QR codes d'un coup (une classe, une série de salles, une liste de liens).</p>
+          <ol><li>Ouvrez <b>Génération en lot</b>.</li>
+          <li>Saisissez <b>une ligne par QR code</b>, au format <code>contenu;nom du fichier</code> (le nom est facultatif).</li>
+          <li>Vous pouvez aussi coller depuis un tableur (colonnes séparées par une tabulation) ou importer un fichier <code>.csv</code> / <code>.txt</code>.</li>
+          <li>Cliquez <b>Télécharger l'archive ZIP</b>.</li></ol>
           <pre>https://exemple.fr;accueil
 https://exemple.fr/rh;rh
-Bonjour !;message</pre></details>
+Bonjour !;message</pre>
+          <p>Maximum 200 lignes. Le ZIP contient chaque code en <b>PNG et SVG</b>, avec l'apparence choisie au-dessus. Les noms en double reçoivent un suffixe (<code>accueil</code>, <code>accueil-2</code>).</p></details>
+
+        <details><summary>Imprimer et afficher : bonnes pratiques</summary>
+          <ul><li><b>Taille</b> : comptez environ 1 cm de côté par mètre de distance de lecture. Minimum conseillé : 2 cm pour un document tenu en main, 10 cm pour une affiche de couloir.</li>
+          <li><b>Marge</b> : laissez une zone calme (blanche) autour du code, elle est comprise dans l'image exportée — ne recadrez pas au plus juste.</li>
+          <li><b>Support</b> : évitez les surfaces brillantes ou plastifiées réfléchissantes, et les plis au milieu du code.</li>
+          <li><b>Hauteur</b> : placez l'affiche à hauteur des yeux ; un code au sol ou trop haut se scanne mal.</li>
+          <li>Ajoutez toujours une <b>consigne écrite</b> à côté (« Scannez pour le menu ») : tout le monde ne devine pas où mène un code.</li></ul></details>
+
+        <details><summary>Affichage et accessibilité</summary>
+          <p>Le bouton <b>Affichage</b> (en haut à droite) règle le thème clair/sombre, la taille du texte, les animations et le contraste renforcé. Ces préférences sont mémorisées sur l'appareil.</p>
+          <p>L'outil s'<b>installe</b> comme une application (bouton Installer dans Affichage, ou « Sur l'écran d'accueil » sur iPhone/iPad) et fonctionne ensuite <b>hors connexion</b>.</p></details>
+
         <details><summary>Problèmes fréquents</summary>
-          <ul><li><b>« Contenu trop long »</b> : raccourcissez le texte ou le lien.</li>
-          <li><b>Le QR ne se scanne pas</b> : augmentez le contraste, retirez le logo ou montez la correction d'erreur.</li>
-          <li><b>Copier ne marche pas</b> : certains navigateurs l'interdisent, utilisez PNG.</li>
-          <li><b>Confidentialité</b> : rien n'est envoyé sur un serveur, tout se calcule dans votre navigateur.</li></ul></details>
+          <ul><li><b>« Contenu trop long »</b> : raccourcissez le texte, ou utilisez un lien court à la place d'une longue adresse.</li>
+          <li><b>Le code ne se scanne pas</b> : augmentez le contraste, revenez à des modules carrés, retirez le logo, montez la correction d'erreur, ou imprimez plus grand.</li>
+          <li><b>Le logo n'apparaît pas</b> : vérifiez le format de l'image (PNG, JPG ou SVG) et réessayez.</li>
+          <li><b>Copier ne fonctionne pas</b> : certains navigateurs l'interdisent, téléchargez le PNG à la place.</li>
+          <li><b>Export PNG impossible</b> : téléchargez le SVG, lisible par tous les logiciels de mise en page.</li>
+          <li><b>Une modification n'apparaît pas</b> : rechargez la page en vidant le cache (Ctrl+Maj+R, ou Cmd+Maj+R sur Mac).</li></ul></details>
+
+        <details><summary>Confidentialité</summary>
+          <p>Tout est calculé <b>dans votre navigateur</b>. Aucune donnée saisie — lien, mot de passe Wi-Fi, contact, logo importé — n'est envoyée sur un serveur, ni enregistrée ailleurs que sur votre appareil. L'outil fonctionne d'ailleurs entièrement hors connexion une fois chargé.</p></details>
       </div>
     </div>
   </dialog>

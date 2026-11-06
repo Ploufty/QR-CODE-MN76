@@ -323,12 +323,66 @@ legend { margin-bottom: .5rem; font-size: .9rem; font-weight: 700; }
 .reset-btn { flex: none; min-height: 2.4rem; }
 .hint-sm { font-size: .82rem; color: var(--muted); }
 
-/* Champs couleur : swatches + pinceau */
-.colorfield { display: inline-flex; flex-wrap: wrap; align-items: center; gap: .3rem; margin-top: .4rem; }
-.swatch { width: 1.5rem; height: 1.5rem; padding: 0; border: 1.5px solid var(--border); border-radius: .35rem; cursor: pointer; }
-.swatch:hover { transform: scale(1.12); border-color: var(--primaire); }
-.brush { width: 2rem; height: 2rem; padding: 0; display: grid; place-items: center; border: 1.5px solid var(--border); border-radius: .4rem; cursor: pointer; background: var(--c, #fff); }
-.brush svg { width: 1.1rem; height: 1.1rem; color: #fff; filter: drop-shadow(0 0 1px rgba(0,0,0,.6)); }
+/* Champs couleur : une pastille ronde -> menu palette */
+.colorfield { display: inline-flex; align-items: center; gap: .4rem; margin-top: .4rem; }
+.colorchip {
+  width: 1.9rem; height: 1.9rem; padding: 0; cursor: pointer;
+  border: 2px solid var(--border); border-radius: 50%; background: var(--c, #fff);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .12);
+  transition: transform .15s var(--spring), border-color .2s;
+}
+.colorchip:hover { transform: scale(1.08); border-color: var(--primaire); }
+.colorchip[aria-expanded="true"] { border-color: var(--primaire); }
+.colormenu {
+  position: absolute; z-index: 90; display: grid; gap: .55rem; padding: .7rem;
+  background: var(--surface); border: 1px solid var(--border); border-radius: .9rem;
+  box-shadow: 0 18px 40px -14px rgba(0, 0, 40, .4);
+}
+.colormenu-grid { display: grid; grid-template-columns: repeat(5, 1.7rem); gap: .45rem; }
+.colormenu .swatch {
+  width: 1.7rem; height: 1.7rem; padding: 0; cursor: pointer;
+  border: 1.5px solid var(--border); border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .1);
+  transition: transform .15s var(--spring), border-color .2s;
+}
+.colormenu .swatch:hover { transform: scale(1.15); border-color: var(--primaire); }
+.colormenu-custom { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; min-height: 2.4rem; font-size: .88rem; }
+.colormenu-custom svg { width: 1rem; height: 1rem; }
+
+#help { width: min(34rem, calc(100% - 2rem)); }
+#help .help { padding: 0 1.5rem 1.5rem; }
+
+.frame-switch { margin-bottom: .6rem; }
+#frameOpts { margin-top: .4rem; }
+
+/* ===== Ajustements v7 : sous-sections, swatches, pinceau, fond pixels, en-tête réduit ===== */
+/* Fond : canvas pixels */
+.bg #bgcanvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+/* En-tête plus compact (gagner en visibilité) */
+.brandbar { padding-block: .7rem; }
+.hero { padding: 1.3rem 0 1.1rem; }
+.hero p { margin-top: .7rem; font-size: 1rem; }
+
+/* Colonne réglages : centrée et lisible */
+.tool > .panel:first-child > .block,
+.tool > .panel:first-child > .typetabs,
+.tool > .panel:first-child > #fields,
+.tool > .panel:first-child > .cat-head-lite,
+.tool > .panel:first-child > #batch { max-width: 34rem; margin-inline: auto; }
+
+/* Sous-sections repliables */
+.sub { border: 1px solid var(--border); border-radius: .7rem; margin-top: .7rem; background: var(--bg); }
+.sub > summary { cursor: pointer; font-weight: 700; padding: .7rem .9rem; list-style-position: inside; }
+.sub[open] > summary { border-bottom: 1px solid var(--border); }
+.sub > .opts, .sub > .icongrid, .sub > .logo-tools, .sub > .shapes, .sub > .hint-sm, .sub > .frame-switch { margin: .8rem; }
+.sub > .icongrid { margin-bottom: .5rem; }
+
+/* Bandeau réglages rapides + reset */
+.custom-head { display: flex; align-items: flex-start; justify-content: space-between; gap: .8rem; margin-bottom: .4rem; }
+.reset-btn { flex: none; min-height: 2.4rem; }
+.hint-sm { font-size: .82rem; color: var(--muted); }
+
 
 /* ===== v8 : choix de fond, boutons, fluidité ===== */
 .bg-label { margin: 1rem 0 .4rem; }
@@ -367,3 +421,13 @@ legend { margin-bottom: .5rem; font-size: .9rem; font-weight: 700; }
 /* Lisibilité des libellés et boutons */
 .btn, .icon-btn { font-size: .95rem; }
 .picklabel, .sublabel { letter-spacing: .01em; font-weight: 700; }
+
+/* Aide contextuelle d'un champ */
+.label-row { display: flex; align-items: center; gap: .4rem; }
+.label-row label { margin: 0; font: inherit; color: inherit; }
+.hint-btn {
+  flex: none; width: 1.35rem; height: 1.35rem; padding: 0; line-height: 1; font-size: .8rem; font-weight: 700;
+  color: var(--primaire); background: var(--primaire-doux); border: 1.5px solid var(--primaire); border-radius: 50%; cursor: pointer;
+}
+.hint-btn:hover { background: var(--primaire); color: var(--on-accent); }
+.field-hint { margin-top: .5rem; padding: .6rem .7rem; font-size: .85rem; font-weight: 400; color: var(--text); background: var(--primaire-doux); border-radius: .6rem; }

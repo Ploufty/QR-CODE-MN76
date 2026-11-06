@@ -152,24 +152,64 @@
   }
 
   // ---- Champs couleur : rangée de swatches + pinceau (choix personnalisé)
+  // Menu de couleur : une pastille ronde par champ ouvre une palette (pastilles rondes) + couleur libre
+  var cmenu = null, cmenuInput = null;
+  function closeColorMenu() {
+    if (!cmenu) return;
+    cmenu.hidden = true;
+    if (cmenuInput) { var c = cmenuInput._chip; if (c) c.setAttribute('aria-expanded', 'false'); }
+    cmenuInput = null;
+  }
+  function buildColorMenu() {
+    cmenu = document.createElement('div');
+    cmenu.className = 'colormenu'; cmenu.hidden = true; cmenu.setAttribute('role', 'dialog'); cmenu.setAttribute('aria-label', 'Choisir une couleur');
+    var grid = document.createElement('div'); grid.className = 'colormenu-grid';
+    COLORS.forEach(function (c) {
+      var s = document.createElement('button');
+      s.type = 'button'; s.className = 'swatch'; s.style.background = c; s.title = c; s.setAttribute('aria-label', 'Couleur ' + c);
+      s.onclick = function () {
+        if (!cmenuInput) return;
+        cmenuInput.value = c; cmenuInput.dispatchEvent(new Event('input', { bubbles: true }));
+        closeColorMenu();
+      };
+      grid.appendChild(s);
+    });
+    var custom = document.createElement('button');
+    custom.type = 'button'; custom.className = 'btn btn-ghost colormenu-custom'; custom.innerHTML = BRUSH + '<span>Couleur libre…</span>';
+    custom.onclick = function () { var i = cmenuInput; closeColorMenu(); if (i) i.click(); };
+    cmenu.appendChild(grid); cmenu.appendChild(custom);
+    document.body.appendChild(cmenu);
+    document.addEventListener('click', function (e) { if (cmenu.hidden) return; if (!cmenu.contains(e.target) && !e.target.closest('.colorchip')) closeColorMenu(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeColorMenu(); });
+    addEventListener('resize', closeColorMenu);
+    addEventListener('scroll', closeColorMenu, true);
+  }
+  function openColorMenu(inp, chip) {
+    if (!cmenu) buildColorMenu();
+    if (cmenuInput === inp && !cmenu.hidden) return closeColorMenu();
+    closeColorMenu();
+    cmenuInput = inp; chip.setAttribute('aria-expanded', 'true');
+    cmenu.hidden = false;
+    var r = chip.getBoundingClientRect(), w = cmenu.offsetWidth;
+    var left = Math.min(Math.max(8, r.left + scrollX), scrollX + innerWidth - w - 8);
+    cmenu.style.left = left + 'px';
+    cmenu.style.top = (r.bottom + scrollY + 6) + 'px';
+    cmenu.querySelector('.swatch').focus();
+  }
   function enhanceColors() {
     ['fg', 'g1', 'g2', 'bgcol', 'csColor', 'cdColor', 'logoColor', 'frameColor', 'frameTextColor'].forEach(function (id) {
       var inp = $(id); if (!inp || inp.dataset.enh) return; inp.dataset.enh = 1;
       var wrap = document.createElement('span'); wrap.className = 'colorfield';
       inp.parentNode.insertBefore(wrap, inp);
-      COLORS.forEach(function (c) {
-        var s = document.createElement('button'); s.type = 'button'; s.className = 'swatch'; s.style.background = c; s.title = c;
-        s.setAttribute('aria-label', 'Couleur ' + c);
-        s.onclick = function () { inp.value = c; inp.dispatchEvent(new Event('input', { bubbles: true })); };
-        wrap.appendChild(s);
-      });
-      var brush = document.createElement('button'); brush.type = 'button'; brush.className = 'brush'; brush.innerHTML = BRUSH;
-      brush.title = 'Couleur personnalisée'; brush.setAttribute('aria-label', 'Choisir une couleur personnalisée');
-      brush.style.setProperty('--c', inp.value);
-      brush.onclick = function () { inp.click(); };
+      var chip = document.createElement('button');
+      chip.type = 'button'; chip.className = 'colorchip'; chip.title = 'Changer la couleur';
+      chip.setAttribute('aria-label', 'Changer la couleur'); chip.setAttribute('aria-expanded', 'false'); chip.setAttribute('aria-haspopup', 'dialog');
+      chip.style.setProperty('--c', inp.value);
+      chip.onclick = function (e) { e.stopPropagation(); openColorMenu(inp, chip); };
+      inp._chip = chip;
       inp.classList.add('sr-only');
-      inp.addEventListener('input', function () { brush.style.setProperty('--c', inp.value); });
-      wrap.appendChild(brush); wrap.appendChild(inp);
+      inp.addEventListener('input', function () { chip.style.setProperty('--c', inp.value); });
+      wrap.appendChild(chip); wrap.appendChild(inp);
     });
   }
 
@@ -327,8 +367,8 @@
   function setVal(id, v) { var e = $(id); if (e) { e.value = v; e.dispatchEvent(new Event('input')); } }   // non-bulle : met à jour le pinceau sans relancer update
   function reset() {
     document.querySelector('input[name=fgmode][value=single]').checked = true; syncFgMode();
-    setVal('fg', '#166534'); setVal('bgcol', '#ffffff'); setVal('csColor', '#166534'); setVal('cdColor', '#166534');
-    setVal('logoColor', '#166534'); setVal('g1', '#166534'); setVal('g2', '#6d28d9'); $('gradType').value = 'linear';
+    setVal('fg', '#000000'); setVal('bgcol', '#ffffff'); setVal('csColor', '#000000'); setVal('cdColor', '#000000');
+    setVal('logoColor', '#000000'); setVal('g1', '#166534'); setVal('g2', '#6d28d9'); $('gradType').value = 'linear';
     shape = { dotsType: 'square', csType: 'square', cdType: 'square' }; markShapes();
     logoURL = ''; logoIcon = -1; $('logo').value = ''; markIcons();
     $('frameOn').checked = false; $('frameOpts').hidden = true; frameStyle = 'classic'; setVal('frameColor', '#000000'); setVal('frameTextColor', '#ffffff'); markFrames();
@@ -435,6 +475,9 @@
   $('fg-mode').addEventListener('change', syncFgMode);
   $('frameOn').addEventListener('change', function () { $('frameOpts').hidden = !this.checked; markFrames(); update(); });
   $('frameColor').addEventListener('input', markFrames);
+  $('ecHintBtn').addEventListener('click', function () {
+    var h = $('ecHint'); h.hidden = !h.hidden; this.setAttribute('aria-expanded', String(!h.hidden));
+  });
   $('bgMode').addEventListener('change', update);   // dans le panneau Aperçu, hors de l'écouteur du formulaire
   $('resetBtn').addEventListener('click', reset);
   $('tabs').closest('.panel').addEventListener('input', function () { clearTimeout(timer); timer = setTimeout(update, 120); });
