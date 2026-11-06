@@ -326,13 +326,19 @@ legend { margin-bottom: .5rem; font-size: .9rem; font-weight: 700; }
 /* Champs couleur : une pastille ronde -> menu palette */
 .colorfield { display: inline-flex; align-items: center; gap: .4rem; margin-top: .4rem; }
 .colorchip {
-  width: 1.9rem; height: 1.9rem; padding: 0; cursor: pointer;
-  border: 2px solid var(--border); border-radius: 50%; background: var(--c, #fff);
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .12);
-  transition: transform .15s var(--spring), border-color .2s;
+  display: inline-flex; align-items: center; gap: .4rem;
+  min-height: 2.75rem; padding: .3rem .55rem .3rem .35rem; cursor: pointer;
+  border: 1.5px solid var(--border); border-radius: 999px; background: var(--surface);
+  transition: border-color .2s, box-shadow .2s, transform .15s var(--spring);
 }
-.colorchip:hover { transform: scale(1.08); border-color: var(--primaire); }
-.colorchip[aria-expanded="true"] { border-color: var(--primaire); }
+.colorchip-dot {
+  width: 1.65rem; height: 1.65rem; flex: none; border-radius: 50%;
+  background: var(--c, #fff); box-shadow: inset 0 0 0 1.5px rgba(0, 0, 0, .18);
+}
+.colorchip-caret { width: .95rem; height: .95rem; color: var(--muted); }
+.colorchip:hover { border-color: var(--primaire); transform: translateY(-1px); box-shadow: 0 4px 10px -6px rgba(0, 0, 60, .35); }
+.colorchip:hover .colorchip-caret { color: var(--primaire); }
+.colorchip[aria-expanded="true"] { border-color: var(--primaire); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primaire) 18%, transparent); }
 .colormenu {
   position: absolute; z-index: 90; display: grid; gap: .55rem; padding: .7rem;
   background: var(--surface); border: 1px solid var(--border); border-radius: .9rem;

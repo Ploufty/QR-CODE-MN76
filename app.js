@@ -204,6 +204,7 @@
       var chip = document.createElement('button');
       chip.type = 'button'; chip.className = 'colorchip'; chip.title = 'Changer la couleur';
       chip.setAttribute('aria-label', 'Changer la couleur'); chip.setAttribute('aria-expanded', 'false'); chip.setAttribute('aria-haspopup', 'dialog');
+      chip.innerHTML = '<span class="colorchip-dot"></span><svg class="colorchip-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
       chip.style.setProperty('--c', inp.value);
       chip.onclick = function (e) { e.stopPropagation(); openColorMenu(inp, chip); };
       inp._chip = chip;
