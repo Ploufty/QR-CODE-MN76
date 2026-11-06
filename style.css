@@ -486,3 +486,31 @@ legend { margin-bottom: .5rem; font-size: .9rem; font-weight: 700; }
 }
 .opts > div.wide:has(> .label-row) > select { width: 14rem; max-width: 100%; margin-top: 0; }
 .opts > div.wide:has(> .label-row) > .field-hint { flex: 1 0 100%; margin-top: .2rem; }
+
+/* ===== v11 : accroche sur 2 lignes + contrôles d'aperçu plus compacts ===== */
+/* Accroche du hero : largeur calée pour tenir sur 2 lignes, lignes équilibrées */
+.hero p { max-width: 44rem; text-wrap: balance; }
+
+/* Colonne de contrôles de l'aperçu : même largeur pour tout, plus compacte */
+.preview .size,
+.preview .bg-choice,
+.preview .fname,
+.preview .btn.full,
+.preview .tool-actions { max-width: 18rem; margin-inline: auto; }
+.preview .btn.full { width: 100%; display: block; }
+.preview .tool-actions { gap: .45rem; }
+.bg-choice { max-width: 18rem; }
+
+/* Souris : contrôles un cran plus petits ; tactile : on garde 44px */
+@media (pointer: fine) {
+  .preview .btn { min-height: 2.4rem; padding: .4rem .9rem; font-size: .9rem; }
+  .preview .seg span { min-height: 2.3rem; font-size: .85rem; }
+  .preview .fname input { padding: .55rem .8rem; }
+}
+/* Rythme vertical homogène des contrôles d'aperçu (~40px en souris) */
+@media (pointer: fine) {
+  .preview .btn { min-height: 2.5rem; }
+  .preview .seg { padding: .2rem; }
+  .preview .seg span { min-height: 2.1rem; }
+  .preview .fname input { padding: .5rem .8rem; }
+}
