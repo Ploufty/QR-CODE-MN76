@@ -356,7 +356,7 @@
 
   function update() {
     var data = TYPES[type].build(values());
-    if (!data) { svg = ''; setButtons(false); $('out').innerHTML = '<p class="out-empty">Remplissez le formulaire pour voir le QR code.</p>'; return; }
+    if (!data) { svg = ''; setButtons(false); $('out').innerHTML = '<p class="out-empty">Remplissez le formulaire pour voir le QR code.</p>'; sheetSchedule(); return; }
     var my = ++token;
     buildSVG(data, true).then(function (s) {
       if (my !== token) return;
@@ -514,11 +514,16 @@
     box.style.setProperty('--cols', o.cols);
     box.style.setProperty('--ppad', (SHEET_MARGIN / o.page[0] * 100) + '%');
     box.style.setProperty('--pgap', (SHEET_GAP / o.page[0] * 100) + '%');
+    var my = ++sheetToken;
     sheetItems(o.perPage).then(function (items) {
+      if (my !== sheetToken) return;   // une demande plus récente a pris la main
       box.innerHTML = items.map(function (s) { return '<span class="cell"><img src="' + svgURL(s) + '" alt=""></span>'; }).join('');
-    }).catch(function (e) { box.innerHTML = '<p class="out-empty">' + xml(e.message) + '</p>'; });
+    }).catch(function (e) {
+      if (my !== sheetToken) return;
+      box.innerHTML = '<p class="out-empty">' + xml(e.message) + '</p>';
+    });
   }
-  var sheetTimer;
+  var sheetTimer, sheetToken = 0;
   function sheetSchedule() { if ($('sheet').open) { clearTimeout(sheetTimer); sheetTimer = setTimeout(sheetRefresh, 150); } }
 
   function sheetDoPrint() {
@@ -533,10 +538,14 @@
       var imgs = [].slice.call(host.querySelectorAll('img'));
       return Promise.all(imgs.map(function (i) { return i.decode ? i.decode().catch(function () {}) : null; })).then(function () {
         document.body.classList.add('printing');
-        var done = function () { document.body.classList.remove('printing'); host.innerHTML = ''; removeEventListener('afterprint', done); };
+        var done = function () {
+          if (!document.body.classList.contains('printing')) return;
+          document.body.classList.remove('printing'); host.innerHTML = '';
+          removeEventListener('afterprint', done); removeEventListener('focus', done);
+        };
         addEventListener('afterprint', done);
+        addEventListener('focus', done);   // filet : la fenêtre reprend le focus à la fermeture du dialogue
         print();
-        setTimeout(done, 10000);  // filet de sécurité si afterprint ne se déclenche pas
       });
     }).catch(function (e) { say(e.message || 'Impression impossible.'); });
   }
