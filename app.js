@@ -42,6 +42,7 @@
 
   // ---- Exemples de cadre (clic = active le cadre + applique style et couleurs ; noir par défaut)
   var FRAMES = [
+    { name: 'Rond', style: 'circle', fcol: '#000000', tcol: '#ffffff' },
     { name: 'Noir', style: 'classic', fcol: '#000000', tcol: '#ffffff' },
     { name: 'Vert', style: 'classic', fcol: '#166534', tcol: '#ffffff' },
     { name: 'Texte en haut', style: 'top', fcol: '#6d28d9', tcol: '#ffffff' },
@@ -50,6 +51,12 @@
     { name: 'Framboise', style: 'classic', fcol: '#c2185b', tcol: '#ffffff' }
   ];
   function frameGlyphBox(ex) {
+    if (ex.style === 'circle') {
+      return '<svg viewBox="0 0 24 24">' +
+        '<circle cx="12" cy="12" r="11" fill="' + ex.fcol + '"/>' +
+        '<circle cx="12" cy="10.5" r="7.5" fill="#fff"/>' +
+        '<rect x="7" y="18" width="10" height="2.6" rx="1" fill="' + ex.tcol + '"/></svg>';
+    }
     var r = { classic: 4, top: 4, ribbon: 1, pill: 8 }[ex.style], top = ex.style === 'top';
     return '<svg viewBox="0 0 24 24">' +
       '<rect x="2" y="2" width="20" height="20" rx="' + r + '" fill="' + ex.fcol + '"/>' +
@@ -328,9 +335,21 @@
   // Emballe le QR (svg 300x300) dans un cadre coloré avec un bandeau de texte
   function framed(qr, text) {
     var M = 22, B = 56, fcol = $('frameColor').value, tcol = $('frameTextColor').value;
+    var inner0 = qr.replace(/^[\s\S]*?<svg[^>]*>/, '').replace(/<\/svg>\s*$/, '');
+    if (frameStyle === 'circle') {
+      // Disque de 440 : pastille blanche (r=170) centrée en y=190 qui contient tout juste le QR réduit à 240,
+      // le texte occupe l'arc bas. Taille de police ajustée à la largeur disponible (252 px).
+      var fs = text ? Math.max(12, Math.min(24, Math.floor(252 / (0.58 * text.length)))) : 24;
+      return '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 440 440" width="440" height="440">' +
+        '<circle cx="220" cy="220" r="220" fill="' + fcol + '"/>' +
+        '<circle cx="220" cy="190" r="170" fill="#ffffff"/>' +
+        '<g transform="translate(100 70) scale(0.8)">' + inner0 + '</g>' +
+        (text ? '<text x="220" y="402" font-family="Marianne, system-ui, sans-serif" font-size="' + fs + '" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="' + tcol + '">' + xml(text) + '</text>' : '') +
+        '</svg>';
+    }
     var r = { classic: 24, top: 24, ribbon: 6, pill: 42 }[frameStyle] || 24, top = frameStyle === 'top';
     var TW = 300 + 2 * M, TH = 300 + M + B, qy = top ? B : M, ty = top ? B / 2 : M + 300 + B / 2;
-    var inner = qr.replace(/^[\s\S]*?<svg[^>]*>/, '').replace(/<\/svg>\s*$/, '');
+    var inner = inner0;
     return '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ' + TW + ' ' + TH + '" width="' + TW + '" height="' + TH + '">' +
       '<rect width="' + TW + '" height="' + TH + '" rx="' + r + '" fill="' + fcol + '"/>' +
       '<rect x="' + (M - 8) + '" y="' + (qy - 8) + '" width="316" height="316" rx="10" fill="#ffffff"/>' +
@@ -628,7 +647,7 @@
       logoIcon = v.logoIcon; logoURL = iconURL(ICONS[logoIcon][1], $('logoColor').value);
     }
     if (v.frameOn === true) { $('frameOn').checked = true; $('frameOpts').hidden = false; }
-    if (['classic', 'top', 'ribbon', 'pill'].indexOf(v.frameStyle) >= 0) frameStyle = v.frameStyle;
+    if (['circle', 'classic', 'top', 'ribbon', 'pill'].indexOf(v.frameStyle) >= 0) frameStyle = v.frameStyle;
     if (v.bgmode === 'opaque' || v.bgmode === 'transparent') document.querySelector('input[name=bgmode][value=' + v.bgmode + ']').checked = true;
     var s = +v.size; if (s >= 256 && s <= 2048) { $('size').value = s; $('sizeVal').textContent = s; }
     syncFgMode();
