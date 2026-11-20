@@ -69,7 +69,7 @@
           <div class="custom-head">
             <div>
               <p class="sublabel">Modèles rapides</p>
-              <div class="presets" id="presets"></div>
+              <div class="presets" id="presets" role="group" aria-label="Modèles rapides"></div>
             </div>
             <button type="button" id="resetBtn" class="btn btn-ghost reset-btn" title="Revenir aux réglages par défaut">↺ Réinitialiser</button>
           </div>
@@ -214,6 +214,7 @@
           <label><input type="radio" name="bgmode" value="opaque" checked><span>Avec fond</span></label>
           <label><input type="radio" name="bgmode" value="transparent"><span>Transparent</span></label>
         </div>
+        <p id="bgWarn" class="field-hint" role="status" hidden></p>
         <label class="fname">Nom du fichier <input type="text" id="fname" value="qrcode" maxlength="60"></label>
         <button id="dlPng" class="btn full" disabled>Télécharger le PNG</button>
         <div class="tool-actions">

@@ -163,7 +163,17 @@
   }
   function buildColorMenu() {
     cmenu = document.createElement('div');
-    cmenu.className = 'colormenu'; cmenu.hidden = true; cmenu.setAttribute('role', 'dialog'); cmenu.setAttribute('aria-label', 'Choisir une couleur');
+    cmenu.className = 'colormenu'; cmenu.hidden = true;
+    cmenu.setAttribute('role', 'dialog'); cmenu.setAttribute('aria-modal', 'true'); cmenu.setAttribute('aria-label', 'Choisir une couleur');
+    // le menu est en fin de page : sans ce piège, Tab sortirait du menu tout en le laissant ouvert
+    cmenu.addEventListener('keydown', function (e) {
+      if (e.key !== 'Tab') return;
+      var f = [].slice.call(cmenu.querySelectorAll('button, input'));
+      if (!f.length) return;
+      var first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
     var grid = document.createElement('div'); grid.className = 'colormenu-grid';
     COLORS.forEach(function (c) {
       var s = document.createElement('button');
@@ -323,7 +333,7 @@
     var inner = qr.replace(/^[\s\S]*?<svg[^>]*>/, '').replace(/<\/svg>\s*$/, '');
     return '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ' + TW + ' ' + TH + '" width="' + TW + '" height="' + TH + '">' +
       '<rect width="' + TW + '" height="' + TH + '" rx="' + r + '" fill="' + fcol + '"/>' +
-      (transparentOn() ? '' : '<rect x="' + (M - 8) + '" y="' + (qy - 8) + '" width="316" height="316" rx="10" fill="#ffffff"/>') +
+      '<rect x="' + (M - 8) + '" y="' + (qy - 8) + '" width="316" height="316" rx="10" fill="#ffffff"/>' +
       '<g transform="translate(' + M + ' ' + qy + ')">' + inner + '</g>' +
       (text ? '<text x="' + (TW / 2) + '" y="' + ty + '" font-family="Marianne, system-ui, sans-serif" font-size="26" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="' + tcol + '">' + xml(text) + '</text>' : '') +
       '</svg>';
@@ -372,10 +382,17 @@
   function qrLabel(data) { return TYPES[type].label + ' : ' + data.replace(/\s+/g, ' ').slice(0, 60); }
   function announce(t) { clearTimeout(annTimer); annTimer = setTimeout(function () { $('announce').textContent = t; }, 600); }
 
+  // Le cadre est un aplat de couleur : il remplit l'image, donc « Transparent » n'a plus d'effet
+  function syncBgWarn() {
+    var w = $('bgWarn'), on = $('frameOn').checked && transparentOn();
+    w.hidden = !on;
+    if (on) w.textContent = "Un cadre remplit toute l'image : l'export ne peut pas être transparent, et le QR reste sur fond clair pour rester lisible. Décochez « Encadrer le QR » pour un fond réellement transparent.";
+  }
+
   function setButtons(ok) { ['dlPng', 'dlSvg', 'copy', 'print'].forEach(function (id) { $(id).disabled = !ok; }); }
 
   function update() {
-    saveLook();
+    saveLook(); syncBgWarn();
     var data = TYPES[type].build(values());
     if (!data) { svg = ''; setButtons(false); $('out').innerHTML = '<p class="out-empty">Remplissez le formulaire pour voir le QR code.</p>'; sheetSchedule(); return; }
     var my = ++token;

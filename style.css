@@ -564,3 +564,4 @@ legend { margin-bottom: .5rem; font-size: .9rem; font-weight: 700; }
 }
 .linklike { padding: 0; border: 0; background: none; color: var(--primaire); font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; }
 .sheet-link { margin-top: .7rem; }
+#bgWarn { max-width: 18rem; margin-inline: auto; text-align: left; }
