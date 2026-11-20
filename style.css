@@ -557,3 +557,10 @@ legend { margin-bottom: .5rem; font-size: .9rem; font-weight: 700; }
 }
 .colormenu-hex input { width: 100%; margin: 0; padding: .4rem .55rem; font-size: .85rem; font-family: ui-monospace, monospace; text-align: center; }
 .hint-btn { width: 1.6rem; height: 1.6rem; font-size: .85rem; }
+/* Les champs couleur natifs sont masqués (sr-only) mais la règle input[type=color] gagnait
+   en spécificité et leur laissait 100% de large -> débordement horizontal au zoom texte. */
+.colorfield input[type="color"].sr-only {
+  width: 1px; height: 1px; min-height: 0; margin: 0; padding: 0; border: 0;
+}
+.linklike { padding: 0; border: 0; background: none; color: var(--primaire); font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; }
+.sheet-link { margin-top: .7rem; }

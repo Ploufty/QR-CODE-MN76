@@ -638,6 +638,11 @@
   $('sheetCount').addEventListener('input', sheetSchedule);
   $('sheet').addEventListener('toggle', function () { if (this.open) sheetRefresh(); });
   $('sheetPrint').addEventListener('click', sheetDoPrint);
+  $('goSheet').addEventListener('click', function () {
+    var s = $('sheet'); s.open = true; sheetRefresh();
+    s.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    s.querySelector('summary').focus({ preventScroll: true });
+  });
   $('tabs').closest('.panel').addEventListener('input', function () { clearTimeout(timer); timer = setTimeout(update, 120); });
 
   enhanceColors(); linesCount(); loadLook();
