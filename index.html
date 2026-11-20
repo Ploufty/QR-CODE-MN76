@@ -151,6 +151,48 @@
           </label>
           <button type="button" id="zip" class="btn full">Télécharger l'archive ZIP</button>
         </details>
+
+        <details class="block" id="sheet">
+          <summary>Planche à imprimer</summary>
+          <p class="hint-sm">Remplit une page A4 de QR codes à découper. L'impression du navigateur permet aussi d'enregistrer en PDF.</p>
+
+          <div class="opts">
+            <div class="wide pickwrap"><span class="picklabel">Que mettre sur la planche</span>
+              <span class="seg" id="sheetSource">
+                <label><input type="radio" name="sheetsrc" value="one" checked><span>Le QR affiché</span></label>
+                <label><input type="radio" name="sheetsrc" value="list"><span>La liste du lot</span></label>
+              </span>
+            </div>
+
+            <div class="wide pickwrap"><span class="picklabel">Taille d'un QR code</span>
+              <span class="seg" id="sheetSize">
+                <label><input type="radio" name="sheetsize" value="20"><span>2 cm</span></label>
+                <label><input type="radio" name="sheetsize" value="30" checked><span>3 cm</span></label>
+                <label><input type="radio" name="sheetsize" value="40"><span>4 cm</span></label>
+                <label><input type="radio" name="sheetsize" value="50"><span>5 cm</span></label>
+              </span>
+            </div>
+
+            <div class="wide pickwrap"><span class="picklabel">Orientation</span>
+              <span class="seg" id="sheetOrient">
+                <label><input type="radio" name="sheetorient" value="portrait" checked><span>Portrait</span></label>
+                <label><input type="radio" name="sheetorient" value="landscape"><span>Paysage</span></label>
+              </span>
+            </div>
+
+            <label class="switch wide"><input type="checkbox" id="sheetCut" checked><span>Repères de découpe</span></label>
+
+            <label id="sheetCountRow">Nombre de QR
+              <input type="number" id="sheetCount" min="1" max="500" step="1" value="40">
+            </label>
+          </div>
+
+          <p id="sheetInfo" class="sheet-info" role="status" aria-live="polite"></p>
+          <div id="sheetPreview" class="sheet-preview" aria-label="Aperçu de la planche"></div>
+          <button type="button" id="sheetPrint" class="btn full">Imprimer la planche</button>
+          <p class="hint-sm credit">Idée de la planche à imprimer inspirée de
+            <a href="https://qrprint.forge.apps.education.fr/app/" target="_blank" rel="noopener">QRPrint</a> ; code écrit pour cet outil.</p>
+        </details>
       </section>
 
       <!-- Aperçu -->
@@ -177,6 +219,8 @@
 
     </div>
   </main>
+
+  <div id="printSheet" class="print-sheet" aria-hidden="true"></div>
 
   <footer class="footer">
     Un outil de la <a href="https://prim76.ac-normandie.fr/numerique" target="_blank" rel="noopener">Mission numérique 76</a> développé par Etienne Liaudet
@@ -260,6 +304,16 @@
 https://exemple.fr/rh;rh
 Bonjour !;message</pre>
           <p>Maximum 200 lignes. Le ZIP contient chaque code en <b>PNG et SVG</b>, avec l'apparence choisie au-dessus. Les noms en double reçoivent un suffixe (<code>accueil</code>, <code>accueil-2</code>).</p></details>
+
+        <details><summary>Planche à imprimer</summary>
+          <p>Remplit une page A4 de QR codes à découper : pratique pour distribuer un même code à toute une classe, ou pour étiqueter une série de lieux.</p>
+          <ol><li>Ouvrez <b>Planche à imprimer</b>, en bas des réglages.</li>
+          <li>Choisissez ce qui va dessus : <b>le QR affiché</b> (répété) ou <b>la liste du lot</b> (un code par ligne).</li>
+          <li>Choisissez la <b>taille d'un QR</b> (2 à 5 cm) et l'<b>orientation</b> : l'outil calcule combien en tiennent par page et l'affiche (par ex. « 5 × 8 = 40 QR par page »).</li>
+          <li>Gardez les <b>repères de découpe</b> si vous comptez découper au massicot ou aux ciseaux.</li>
+          <li><b>Imprimer la planche</b> : dans la boîte d'impression, vous pouvez aussi choisir « Enregistrer en PDF ».</li></ol>
+          <p>Conseil : laissez les marges d'impression par défaut, la planche est calculée pour elles. S'il y a plus de codes que de places, l'impression continue sur les pages suivantes.</p>
+          <p class="credit">Idée de cette fonctionnalité inspirée de <a href="https://qrprint.forge.apps.education.fr/app/" target="_blank" rel="noopener">QRPrint</a>, un autre outil libre de la forge des communs numériques éducatifs. Le code de cette planche a été écrit spécifiquement pour cet outil.</p></details>
 
         <details><summary>Imprimer et afficher : bonnes pratiques</summary>
           <ul><li><b>Taille</b> : comptez environ 1 cm de côté par mètre de distance de lecture. Minimum conseillé : 2 cm pour un document tenu en main, 10 cm pour une affiche de couloir.</li>

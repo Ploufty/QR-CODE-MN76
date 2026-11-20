@@ -360,7 +360,7 @@
     var my = ++token;
     buildSVG(data, true).then(function (s) {
       if (my !== token) return;
-      svg = s; $('out').innerHTML = s; $('msg').textContent = ''; setButtons(true);
+      svg = s; $('out').innerHTML = s; $('msg').textContent = ''; setButtons(true); sheetSchedule();
     }).catch(function () {
       if (my !== token) return;
       svg = ''; setButtons(false); $('out').innerHTML = '<p class="out-empty">Contenu trop long pour un QR code.</p>';
@@ -474,6 +474,73 @@
     })();
   };
 
+  // ======================= Planche à imprimer =======================
+  // Idée inspirée de QRPrint ; implémentation propre : on raisonne en taille réelle (mm)
+  // et on laisse le navigateur imprimer une vraie page A4, sans bibliothèque PDF.
+  var A4 = { portrait: [210, 297], landscape: [297, 210] }, SHEET_MARGIN = 8, SHEET_GAP = 4;
+  function svgURL(s) { return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(s); }
+  function pick(name) { return document.querySelector('input[name=' + name + ']:checked').value; }
+
+  function sheetOpts() {
+    var size = +pick('sheetsize'), orient = pick('sheetorient'), page = A4[orient];
+    var cols = Math.max(1, Math.floor((page[0] - 2 * SHEET_MARGIN + SHEET_GAP) / (size + SHEET_GAP)));
+    var rows = Math.max(1, Math.floor((page[1] - 2 * SHEET_MARGIN + SHEET_GAP) / (size + SHEET_GAP)));
+    return { size: size, orient: orient, page: page, cols: cols, rows: rows, perPage: cols * rows };
+  }
+  // Rassemble les SVG à poser sur la planche
+  function sheetItems(limit) {
+    if (pick('sheetsrc') === 'list') {
+      var rows = parseLines($('lines').value);
+      if (!rows.length) return Promise.reject(new Error('La liste du lot est vide.'));
+      if (limit) rows = rows.slice(0, limit);
+      return Promise.all(rows.map(function (r) { return buildSVG(r[0], false); }));
+    }
+    if (!svg) return Promise.reject(new Error('Créez d\'abord un QR code.'));
+    var n = Math.max(1, Math.min(500, +$('sheetCount').value || 1));
+    if (limit) n = Math.min(n, limit);
+    return Promise.resolve(new Array(n).fill(svg));
+  }
+
+  function sheetRefresh() {
+    var o = sheetOpts(), list = pick('sheetsrc') === 'list';
+    $('sheetCountRow').hidden = list;
+    var n = list ? parseLines($('lines').value).length : Math.max(1, Math.min(500, +$('sheetCount').value || 1));
+    var pages = Math.max(1, Math.ceil(n / o.perPage));
+    $('sheetInfo').textContent = o.cols + ' × ' + o.rows + ' = ' + o.perPage + ' QR par page A4 ' +
+      (o.orient === 'portrait' ? 'portrait' : 'paysage') + ' — ' + n + ' QR, ' + pages + ' page' + (pages > 1 ? 's' : '');
+    var box = $('sheetPreview');
+    box.className = 'sheet-preview' + ($('sheetCut').checked ? ' cut' : '');
+    box.style.aspectRatio = o.page[0] + ' / ' + o.page[1];
+    box.style.setProperty('--cols', o.cols);
+    box.style.setProperty('--ppad', (SHEET_MARGIN / o.page[0] * 100) + '%');
+    box.style.setProperty('--pgap', (SHEET_GAP / o.page[0] * 100) + '%');
+    sheetItems(o.perPage).then(function (items) {
+      box.innerHTML = items.map(function (s) { return '<span class="cell"><img src="' + svgURL(s) + '" alt=""></span>'; }).join('');
+    }).catch(function (e) { box.innerHTML = '<p class="out-empty">' + xml(e.message) + '</p>'; });
+  }
+  var sheetTimer;
+  function sheetSchedule() { if ($('sheet').open) { clearTimeout(sheetTimer); sheetTimer = setTimeout(sheetRefresh, 150); } }
+
+  function sheetDoPrint() {
+    sheetItems().then(function (items) {
+      var o = sheetOpts(), host = $('printSheet');
+      // orientation via une page nommée déclarée dans style.css (pas de <style> injecté : CSP style-src 'self')
+      host.className = 'print-sheet ' + o.orient + ($('sheetCut').checked ? ' cut' : '');
+      host.style.setProperty('--qr', o.size + 'mm');
+      host.style.setProperty('--cols', o.cols);   // grille figée : l'impression correspond à l'aperçu
+      host.style.setProperty('--gap', SHEET_GAP + 'mm');
+      host.innerHTML = items.map(function (s) { return '<span class="print-cell"><img src="' + svgURL(s) + '" alt=""></span>'; }).join('');
+      var imgs = [].slice.call(host.querySelectorAll('img'));
+      return Promise.all(imgs.map(function (i) { return i.decode ? i.decode().catch(function () {}) : null; })).then(function () {
+        document.body.classList.add('printing');
+        var done = function () { document.body.classList.remove('printing'); host.innerHTML = ''; removeEventListener('afterprint', done); };
+        addEventListener('afterprint', done);
+        print();
+        setTimeout(done, 10000);  // filet de sécurité si afterprint ne se déclenche pas
+      });
+    }).catch(function (e) { say(e.message || 'Impression impossible.'); });
+  }
+
   // ======================= Écouteurs =======================
   $('size').addEventListener('input', function () { $('sizeVal').textContent = this.value; });
   $('fg-mode').addEventListener('change', syncFgMode);
@@ -484,6 +551,16 @@
   });
   $('bgMode').addEventListener('change', update);   // dans le panneau Aperçu, hors de l'écouteur du formulaire
   $('resetBtn').addEventListener('click', reset);
+  ['sheetSource', 'sheetSize', 'sheetOrient'].forEach(function (id) {
+    $(id).addEventListener('change', function () {
+      if (id !== 'sheetSource') $('sheetCount').value = sheetOpts().perPage;   // nouvelle capacité de page
+      sheetRefresh();
+    });
+  });
+  $('sheetCut').addEventListener('change', sheetRefresh);
+  $('sheetCount').addEventListener('input', sheetSchedule);
+  $('sheet').addEventListener('toggle', function () { if (this.open) sheetRefresh(); });
+  $('sheetPrint').addEventListener('click', sheetDoPrint);
   $('tabs').closest('.panel').addEventListener('input', function () { clearTimeout(timer); timer = setTimeout(update, 120); });
 
   enhanceColors();

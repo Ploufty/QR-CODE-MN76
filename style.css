@@ -514,3 +514,36 @@ legend { margin-bottom: .5rem; font-size: .9rem; font-weight: 700; }
   .preview .seg span { min-height: 2.1rem; }
   .preview .fname input { padding: .5rem .8rem; }
 }
+
+/* ===== Planche à imprimer ===== */
+.sheet-info { margin: .7rem 0 .4rem; font-size: .85rem; font-weight: 700; color: var(--primaire); }
+.sheet-preview {
+  display: grid; grid-template-columns: repeat(var(--cols, 5), 1fr);
+  gap: var(--pgap, 2%); padding: var(--ppad, 4%); align-content: start;
+  background: #fff; border: 1px solid var(--border); border-radius: .4rem;
+  box-shadow: var(--shadow); margin-bottom: .8rem; overflow: hidden;
+  width: 13rem; max-width: 100%;   /* vignette de page, pas pleine largeur */
+}
+.sheet-preview .cell { aspect-ratio: 1; }
+.sheet-preview img { width: 100%; height: 100%; display: block; }
+.sheet-preview.cut .cell { outline: 1px dashed #c3c3cf; outline-offset: 1px; }
+.sheet-preview .out-empty { grid-column: 1 / -1; align-self: center; text-align: center; }
+.credit { margin-top: .6rem; }
+#sheetCount { width: 6rem; }
+
+/* Rendu d'impression de la planche (taille réelle en mm) */
+@page qrportrait { size: A4 portrait; margin: 8mm; }
+@page qrlandscape { size: A4 landscape; margin: 8mm; }
+.print-sheet { display: none; }
+@media print {
+  body.printing > *:not(#printSheet) { display: none !important; }
+  body.printing #printSheet.portrait { page: qrportrait; }
+  body.printing #printSheet.landscape { page: qrlandscape; }
+  body.printing #printSheet {
+    display: grid !important; grid-template-columns: repeat(var(--cols), var(--qr));
+    gap: var(--gap); justify-content: center; align-content: start;
+  }
+  .print-cell { box-sizing: border-box; width: var(--qr); height: var(--qr); break-inside: avoid; }
+  .print-cell img { width: 100%; height: 100%; display: block; }
+  .print-sheet.cut .print-cell { outline: .25mm dashed #999; outline-offset: .5mm; }
+}
