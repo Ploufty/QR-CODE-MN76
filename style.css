@@ -625,3 +625,18 @@ legend { margin-bottom: .5rem; font-size: .9rem; font-weight: 700; }
 @keyframes wizIn { from { opacity: 0; transform: translateY(.5rem); } }
 .out.pop { animation: outPop .7s var(--spring); }
 @keyframes outPop { 0% { transform: scale(.97); } 55% { transform: scale(1.025); } 100% { transform: scale(1); } }
+
+/* Repère d'action : 3 pulsations douces, jamais en boucle */
+@keyframes attn3 {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--primaire) 0%, transparent); }
+  50% { box-shadow: 0 0 0 .55rem color-mix(in srgb, var(--primaire) 38%, transparent); }
+}
+.btn.attn { animation: attn3 .6s ease-in-out 3; }
+
+/* Arrivée sur la planche : la section se signale clairement */
+@keyframes flash3 {
+  0%, 100% { background: transparent; box-shadow: 0 0 0 0 color-mix(in srgb, var(--primaire) 0%, transparent); }
+  50% { background: var(--primaire-doux); box-shadow: 0 0 0 .4rem color-mix(in srgb, var(--primaire) 30%, transparent); }
+}
+#sheet.flash { border-radius: .7rem; animation: flash3 .75s ease-in-out 3; }
+#sheet.flash > summary { color: var(--primaire); }

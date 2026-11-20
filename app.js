@@ -716,6 +716,9 @@
       var o = $('out');
       o.classList.remove('pop'); void o.offsetWidth; o.classList.add('pop');
       setTimeout(function () { o.classList.remove('pop'); }, 900);
+      var dl = $('dlPng');   // on pointe l'action à faire : 3 clignotements, puis plus rien
+      dl.classList.remove('attn'); void dl.offsetWidth; dl.classList.add('attn');
+      setTimeout(function () { dl.classList.remove('attn'); }, 2000);
     }
   }
   function setMode(m) {
@@ -759,6 +762,8 @@
     var s = $('sheet'); s.open = true; sheetRefresh();
     s.scrollIntoView({ behavior: 'smooth', block: 'start' });
     s.querySelector('summary').focus({ preventScroll: true });
+    s.classList.remove('flash'); void s.offsetWidth; s.classList.add('flash');   // on montre où on vient d'arriver
+    setTimeout(function () { s.classList.remove('flash'); }, 2600);
   });
   $('main').addEventListener('input', function () { clearTimeout(timer); timer = setTimeout(update, 120); });
 
