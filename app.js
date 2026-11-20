@@ -42,13 +42,13 @@
 
   // ---- Exemples de cadre (clic = active le cadre + applique style et couleurs ; noir par défaut)
   var FRAMES = [
-    { name: 'Rond', style: 'circle', fcol: '#000000', tcol: '#ffffff' },
     { name: 'Noir', style: 'classic', fcol: '#000000', tcol: '#ffffff' },
     { name: 'Vert', style: 'classic', fcol: '#166534', tcol: '#ffffff' },
     { name: 'Texte en haut', style: 'top', fcol: '#6d28d9', tcol: '#ffffff' },
     { name: 'Ruban', style: 'ribbon', fcol: '#1e1e2f', tcol: '#ffffff' },
     { name: 'Pilule', style: 'pill', fcol: '#166534', tcol: '#ffffff' },
-    { name: 'Framboise', style: 'classic', fcol: '#c2185b', tcol: '#ffffff' }
+    { name: 'Framboise', style: 'classic', fcol: '#c2185b', tcol: '#ffffff' },
+    { name: 'Rond', style: 'circle', fcol: '#000000', tcol: '#ffffff' }
   ];
   function frameGlyphBox(ex) {
     if (ex.style === 'circle') {
@@ -709,6 +709,14 @@
     $('wizPrev').disabled = wizStep === 0;
     $('wizNext').textContent = wizStep === STEPS.length - 1 ? 'Terminer' : 'Suivant →';
     $('wizNote').textContent = '';
+    // Dernière étape : petit signal de réussite, coupé si les animations sont réduites
+    var last = wizStep === STEPS.length - 1;
+    $('wizDone').hidden = !last;
+    if (last && document.documentElement.dataset.motion !== 'reduce') {
+      var o = $('out');
+      o.classList.remove('pop'); void o.offsetWidth; o.classList.add('pop');
+      setTimeout(function () { o.classList.remove('pop'); }, 900);
+    }
   }
   function setMode(m) {
     var guided = m === 'guided';

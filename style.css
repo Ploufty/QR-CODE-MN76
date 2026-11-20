@@ -612,3 +612,16 @@ legend { margin-bottom: .5rem; font-size: .9rem; font-weight: 700; }
 }
 #wizSlot > label > select, #wizSlot > label > input[type="text"] { width: 14rem; max-width: 100%; margin-top: 0; }
 #wizSlot > label > .seg.mini { width: 100%; }
+
+/* Dernière étape de l'assistant : signal de réussite discret */
+.wiz-done {
+  display: flex; align-items: center; gap: .5rem; margin-bottom: .6rem;
+  padding: .6rem .8rem; border-radius: .6rem;
+  background: var(--primaire-doux); color: var(--primaire); font-weight: 700;
+  animation: wizIn .45s var(--spring) both;
+}
+.wiz-done span { display: grid; place-items: center; width: 1.5rem; height: 1.5rem; flex: none;
+  border-radius: 50%; background: var(--primaire); color: var(--on-accent); font-size: .9rem; }
+@keyframes wizIn { from { opacity: 0; transform: translateY(.5rem); } }
+.out.pop { animation: outPop .7s var(--spring); }
+@keyframes outPop { 0% { transform: scale(.97); } 55% { transform: scale(1.025); } 100% { transform: scale(1); } }
