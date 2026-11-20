@@ -646,9 +646,13 @@
     { title: 'Votre contenu',
       help: '', more: '', nodes: ['#fields'], needData: true },
     { title: 'L\'allure (facultatif)',
-      help: 'Cliquez un modèle pour changer couleurs et formes d\'un coup. Vous pouvez aussi passer directement à la suite.',
-      more: "Gardez un fort contraste : code foncé sur fond clair. C'est ce qui garantit qu'il sera lu par tous les téléphones, même anciens, même mal imprimé. Le premier modèle est le style classique, le plus sûr.",
-      nodes: ['#presets'] },
+      help: 'Cliquez un modèle pour tout changer d\'un coup, ou réglez vous-même les couleurs juste en dessous.',
+      more: "Gardez un fort contraste : code foncé sur fond clair. C'est ce qui garantit qu'il sera lu par tous les téléphones, même anciens, même mal imprimé. Le premier modèle est le style classique, le plus sûr. « Dégradé » fait passer les modules d'une couleur à l'autre ; pour régler aussi la forme des modules et des marqueurs, basculez en mode Complet.",
+      nodes: ['#presets', '#fgModeRow', '#fg-single-1', '#fg-grad-1', '#fg-grad-2', '#fg-grad-type', '#bgColorRow'] },
+    { title: 'Un logo au centre (facultatif)',
+      help: 'Choisissez une icône, ou importez votre propre image (logo de l\'école, de la collectivité…).',
+      more: "Dès qu'un logo est présent, la correction d'erreur passe au maximum pour compenser la zone masquée : le code reste lisible. Évitez les images très claires ou très détaillées, et testez toujours le scan après avoir ajouté un logo. « Retirer » revient à un code sans logo.",
+      nodes: ['#subLogo'] },
     { title: 'Un cadre avec un message (facultatif)',
       help: 'Un cadre avec « Scannez-moi » augmente nettement le nombre de personnes qui scannent une affiche.',
       more: "Cochez « Encadrer le QR », ou cliquez directement un exemple. Le texte affiché est celui du champ ci-dessus (40 caractères maximum). Attention : un cadre remplit toute l'image, l'export ne pourra donc pas être transparent.",
@@ -661,10 +665,12 @@
   function wizTake(sel) {
     var n = document.querySelector(sel); if (!n) return;
     if (!n.wizHome) { var ph = document.createComment('wiz'); n.parentNode.insertBefore(ph, n); n.wizHome = ph; }
+    if (n.tagName === 'DETAILS') { n.wizWasOpen = n.open; n.open = true; }   // une étape ne doit rien cacher
     $('wizSlot').appendChild(n);
   }
   function wizReturn() {
     [].slice.call($('wizSlot').children).forEach(function (n) {
+      if (n.tagName === 'DETAILS' && n.wizWasOpen !== undefined) n.open = n.wizWasOpen;
       if (n.wizHome && n.wizHome.parentNode) n.wizHome.parentNode.insertBefore(n, n.wizHome);
     });
   }

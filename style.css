@@ -600,3 +600,8 @@ legend { margin-bottom: .5rem; font-size: .9rem; font-weight: 700; }
   .hero h1 { font-size: clamp(1.35rem, 6vw, 1.8rem); line-height: 1.15; }
   .wiz-nav .btn { min-height: 2.6rem; }
 }
+/* Une sous-section déplacée dans l'assistant : pas de carte imbriquée ni d'en-tête redondant */
+#wizSlot .sub { border: 0; background: none; margin: 0; }
+#wizSlot .sub > summary { display: none; }
+#wizSlot .sub > .opts, #wizSlot .sub > .icongrid, #wizSlot .sub > .logo-tools,
+#wizSlot .sub > .shapes, #wizSlot .sub > .hint-sm, #wizSlot .sub > .frame-switch { margin-inline: 0; }
