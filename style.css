@@ -565,3 +565,38 @@ legend { margin-bottom: .5rem; font-size: .9rem; font-weight: 700; }
 .linklike { padding: 0; border: 0; background: none; color: var(--primaire); font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; }
 .sheet-link { margin-top: .7rem; }
 #bgWarn { max-width: 18rem; margin-inline: auto; text-align: left; }
+
+/* ===== Deux modes : assistant pas à pas / complet ===== */
+.mode-bar { display: flex; justify-content: center; margin: 0 0 1rem; }
+.mode-switch { width: min(22rem, 100%); }
+#wizard { grid-column: 1; grid-row: 1; }
+.wiz-progress { font-size: .85rem; font-weight: 700; color: var(--muted); text-align: center; margin-bottom: .4rem; }
+.wiz-bar { height: .4rem; border-radius: 999px; background: var(--border); overflow: hidden; margin-bottom: 1.1rem; }
+.wiz-bar span { display: block; height: 100%; background: var(--primaire); border-radius: 999px; transition: width .3s var(--ease); }
+.wiz-title { font-size: 1.15rem; font-weight: 700; margin-bottom: .4rem; }
+.wiz-help { color: var(--muted); margin-bottom: .8rem; }
+.wiz-more { margin-bottom: 1rem; }
+.wiz-more > summary { cursor: pointer; font-weight: 700; color: var(--primaire); font-size: .9rem; }
+.wiz-more p { margin-top: .5rem; padding: .7rem; background: var(--primaire-doux); border-radius: .6rem; font-size: .9rem; }
+#wizSlot { margin-bottom: .8rem; }
+.wiz-note { min-height: 1.2em; font-size: .85rem; font-weight: 700; color: var(--accent); }
+.wiz-nav { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; margin-top: .6rem; }
+.wiz-nav .btn { min-height: 2.75rem; }
+#wizard .typetabs, #wizard .presets, #wizard .shapes { justify-content: center; }
+#wizard > *, #wizSlot > * { max-width: 34rem; margin-inline: auto; }
+@media (max-width: 860px) { #wizard { grid-column: 1; grid-row: auto; order: 1; } }
+/* Mobile : assistant compacté pour que le QR reste visible sous l'étape */
+@media (max-width: 600px) {
+  #wizard > .cat-head-lite { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .mode-bar { margin-bottom: .7rem; }
+  .mode-switch span { min-height: 2.2rem; font-size: .85rem; }
+  .hero h1 { font-size: clamp(1.5rem, 6.5vw, 2.1rem); }
+  .wiz-bar { margin-bottom: .8rem; }
+  .wiz-help { margin-bottom: .6rem; }
+  #wizSlot { margin-bottom: .6rem; }
+}
+@media (max-width: 600px) {
+  .hero { padding: .2rem 0 .5rem; }
+  .hero h1 { font-size: clamp(1.35rem, 6vw, 1.8rem); line-height: 1.15; }
+  .wiz-nav .btn { min-height: 2.6rem; }
+}

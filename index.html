@@ -50,7 +50,30 @@
   </header>
 
   <main class="main container" id="main">
+    <div class="mode-bar">
+      <div class="seg mode-switch" id="modeSwitch" role="group" aria-label="Mode d'utilisation">
+        <label><input type="radio" name="mode" value="guided"><span>Pas à pas</span></label>
+        <label><input type="radio" name="mode" value="full"><span>Complet</span></label>
+      </div>
+    </div>
+
     <div class="tool">
+      <!-- Assistant pas à pas -->
+      <section class="panel" id="wizard" aria-labelledby="t-wiz" hidden>
+        <h2 id="t-wiz" class="cat-head-lite">Créer un QR code, étape par étape</h2>
+        <p class="wiz-progress" id="wizProgress"></p>
+        <div class="wiz-bar" aria-hidden="true"><span id="wizFill"></span></div>
+        <h3 class="wiz-title" id="wizTitle"></h3>
+        <p class="wiz-help" id="wizHelp"></p>
+        <details class="wiz-more" id="wizMore"><summary>En savoir plus</summary><p id="wizMoreText"></p></details>
+        <div id="wizSlot"></div>
+        <p class="wiz-note" id="wizNote" role="status" aria-live="polite"></p>
+        <div class="wiz-nav">
+          <button type="button" id="wizPrev" class="btn btn-ghost">← Précédent</button>
+          <button type="button" id="wizNext" class="btn">Suivant →</button>
+        </div>
+      </section>
+
       <!-- Formulaire -->
       <section class="panel" id="content" aria-labelledby="t-form">
         <h2 id="t-form" class="cat-head-lite">Contenu</h2>
@@ -119,7 +142,7 @@
             </div>
           </details>
 
-          <details class="sub">
+          <details class="sub" id="subLogo">
             <summary>Logo au centre</summary>
             <div class="icongrid" id="icongrid" role="group" aria-label="Icônes de logo"></div>
             <div class="logo-tools">
@@ -130,7 +153,7 @@
             </div>
           </details>
 
-          <details class="sub">
+          <details class="sub" id="subFrame">
             <summary>Cadre &amp; texte</summary>
             <div class="opts">
               <label class="wide">Texte sous le QR / du cadre
@@ -246,6 +269,12 @@
         </button>
       </div>
       <div class="help">
+        <details><summary>Les deux modes</summary>
+          <p>En haut de la page, deux modes au choix — votre préférence est retenue sur cet appareil :</p>
+          <ul><li><b>Pas à pas</b> : l'outil vous guide en 5 étapes, avec une explication à chaque fois et un « En savoir plus » si vous voulez le détail. C'est le mode conseillé la première fois.</li>
+          <li><b>Complet</b> : tous les réglages sur une seule page. Plus rapide quand on connaît l'outil.</li></ul>
+          <p>Les deux produisent exactement le même QR code : ce sont deux façons d'accéder aux mêmes réglages. Vous pouvez changer de mode à tout moment sans rien perdre.</p></details>
+
         <details open><summary>Démarrage rapide</summary>
           <ol><li>Choisissez le <b>type</b> de contenu en haut (Lien, Texte, Wi-Fi, Contact, E-mail, Téléphone).</li>
           <li>Remplissez les champs : <b>l'aperçu se met à jour tout seul</b>, rien à valider.</li>

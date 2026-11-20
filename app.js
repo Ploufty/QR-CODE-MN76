@@ -7,17 +7,17 @@
 
   // ---- Types : champs [id, libellé, type, placeholder|options] et build() -> chaîne ('' = incomplet)
   var TYPES = {
-    url: { label: 'Lien', fields: [['u', 'Adresse du site', 'url', 'https://exemple.fr']],
+    url: { label: 'Lien', tip: "Collez l'adresse du site. Inutile d'écrire « https:// », il est ajouté tout seul.", fields: [['u', 'Adresse du site', 'url', 'https://exemple.fr']],
       build: function (v) { var u = v.u.trim(); return u && !/^[a-z][a-z0-9+.-]*:/i.test(u) ? 'https://' + u : u; } },
-    text: { label: 'Texte', fields: [['t', 'Message', 'textarea', '']],
+    text: { label: 'Texte', tip: "Tapez le message qui s'affichera sur le téléphone. Plus il est court, plus le code se scanne de loin.", fields: [['t', 'Message', 'textarea', '']],
       build: function (v) { return v.t; } },
-    wifi: { label: 'Wi-Fi', fields: [['s', 'Nom du réseau (SSID)', 'text', ''], ['p', 'Mot de passe', 'text', ''], ['k', 'Sécurité', 'select', ['WPA', 'WEP', 'nopass']]],
+    wifi: { label: 'Wi-Fi', tip: "Le nom du réseau doit être saisi exactement comme il apparaît. La sécurité est WPA dans la quasi-totalité des cas.", fields: [['s', 'Nom du réseau (SSID)', 'text', ''], ['p', 'Mot de passe', 'text', ''], ['k', 'Sécurité', 'select', ['WPA', 'WEP', 'nopass']]],
       build: function (v) { return v.s ? 'WIFI:T:' + v.k + ';S:' + esc(v.s) + ';' + (v.k === 'nopass' ? '' : 'P:' + esc(v.p) + ';') + ';' : ''; } },
-    contact: { label: 'Contact', fields: [['n', 'Nom complet', 'text', ''], ['o', 'Société', 'text', ''], ['f', 'Téléphone', 'tel', ''], ['m', 'E-mail', 'email', '']],
+    contact: { label: 'Contact', tip: "Le nom suffit, le reste est facultatif. Le téléphone proposera d'enregistrer la fiche dans le répertoire.", fields: [['n', 'Nom complet', 'text', ''], ['o', 'Société', 'text', ''], ['f', 'Téléphone', 'tel', ''], ['m', 'E-mail', 'email', '']],
       build: function (v) { return v.n ? ['BEGIN:VCARD', 'VERSION:3.0', 'FN:' + vc(v.n), v.o && 'ORG:' + vc(v.o), v.f && 'TEL:' + vc(v.f), v.m && 'EMAIL:' + vc(v.m), 'END:VCARD'].filter(Boolean).join('\n') : ''; } },
-    mail: { label: 'E-mail', fields: [['a', 'Destinataire', 'email', ''], ['j', 'Objet', 'text', ''], ['b', 'Message', 'textarea', '']],
+    mail: { label: 'E-mail', tip: "Seul le destinataire est obligatoire. L'objet et le message arrivent pré-remplis dans la messagerie.", fields: [['a', 'Destinataire', 'email', ''], ['j', 'Objet', 'text', ''], ['b', 'Message', 'textarea', '']],
       build: function (v) { return v.a ? 'mailto:' + v.a + '?subject=' + encodeURIComponent(v.j) + '&body=' + encodeURIComponent(v.b) : ''; } },
-    tel: { label: 'Téléphone', fields: [['n', 'Numéro', 'tel', '+33 6 00 00 00 00']],
+    tel: { label: 'Téléphone', tip: "Le numéro, avec l'indicatif si vous diffusez hors de France. Le téléphone proposera d'appeler.", fields: [['n', 'Numéro', 'tel', '+33 6 00 00 00 00']],
       build: function (v) { return v.n ? 'tel:' + v.n.replace(/[^\d+]/g, '') : ''; } }
   };
 
@@ -634,6 +634,66 @@
     syncFgMode();
   }
 
+  // ======================= Deux modes : assistant / complet =======================
+  // L'assistant ne duplique rien : il déplace les vrais contrôles dans son emplacement,
+  // chacun gardant ses écouteurs et son état. Un repère (commentaire) marque leur place d'origine.
+  var MODE_KEY = 'qr-mn76-mode', wizStep = 0;
+  var STEPS = [
+    { title: 'Que doit faire votre QR code ?',
+      help: 'Choisissez ce qui se passera quand quelqu\'un le scannera avec son téléphone.',
+      more: "Un QR code contient du texte. Selon la façon dont ce texte est écrit, le téléphone comprend qu'il s'agit d'un site, d'un réseau Wi-Fi, d'un contact… et propose l'action correspondante. C'est tout ce que change ce choix.",
+      nodes: ['#tabs'] },
+    { title: 'Votre contenu',
+      help: '', more: '', nodes: ['#fields'], needData: true },
+    { title: 'L\'allure (facultatif)',
+      help: 'Cliquez un modèle pour changer couleurs et formes d\'un coup. Vous pouvez aussi passer directement à la suite.',
+      more: "Gardez un fort contraste : code foncé sur fond clair. C'est ce qui garantit qu'il sera lu par tous les téléphones, même anciens, même mal imprimé. Le premier modèle est le style classique, le plus sûr.",
+      nodes: ['#presets'] },
+    { title: 'Un cadre avec un message (facultatif)',
+      help: 'Un cadre avec « Scannez-moi » augmente nettement le nombre de personnes qui scannent une affiche.',
+      more: "Cochez « Encadrer le QR », ou cliquez directement un exemple. Le texte affiché est celui du champ ci-dessus (40 caractères maximum). Attention : un cadre remplit toute l'image, l'export ne pourra donc pas être transparent.",
+      nodes: ['#subFrame'] },
+    { title: 'Récupérer votre QR code',
+      help: 'Votre code est prêt, à droite (ou juste au-dessus sur téléphone). Choisissez le format et téléchargez-le.',
+      more: "PNG pour un document ou un écran ; SVG pour l'imprimeur, car il s'agrandit sans perte. Le curseur règle la taille du PNG. Pour en imprimer plusieurs à découper sur une page A4, utilisez « Ouvrir la planche à imprimer ». Testez toujours le code avec un téléphone avant de le diffuser.",
+      nodes: [] }
+  ];
+  function wizTake(sel) {
+    var n = document.querySelector(sel); if (!n) return;
+    if (!n.wizHome) { var ph = document.createComment('wiz'); n.parentNode.insertBefore(ph, n); n.wizHome = ph; }
+    $('wizSlot').appendChild(n);
+  }
+  function wizReturn() {
+    [].slice.call($('wizSlot').children).forEach(function (n) {
+      if (n.wizHome && n.wizHome.parentNode) n.wizHome.parentNode.insertBefore(n, n.wizHome);
+    });
+  }
+  function wizShow(i) {
+    wizReturn();
+    wizStep = Math.max(0, Math.min(STEPS.length - 1, i));
+    var s = STEPS[wizStep];
+    $('wizProgress').textContent = 'Étape ' + (wizStep + 1) + ' sur ' + STEPS.length;
+    $('wizFill').style.width = ((wizStep + 1) / STEPS.length * 100) + '%';
+    $('wizTitle').textContent = s.title;
+    var help = s.help, more = s.more;
+    if (wizStep === 1) { help = TYPES[type].tip; more = "Le contenu peut être modifié à tout moment : l'aperçu se met à jour tout seul, il n'y a rien à valider."; }
+    $('wizHelp').textContent = help;
+    $('wizMoreText').textContent = more;
+    $('wizMore').hidden = !more; $('wizMore').open = false;
+    s.nodes.forEach(wizTake);
+    $('wizPrev').disabled = wizStep === 0;
+    $('wizNext').textContent = wizStep === STEPS.length - 1 ? 'Terminer' : 'Suivant →';
+    $('wizNote').textContent = '';
+  }
+  function setMode(m) {
+    var guided = m === 'guided';
+    document.querySelector('input[name=mode][value=' + (guided ? 'guided' : 'full') + ']').checked = true;
+    $('wizard').hidden = !guided;
+    if (guided) { wizShow(wizStep); } else { wizReturn(); }
+    $('content').hidden = guided; $('tools').hidden = guided;
+    try { localStorage.setItem(MODE_KEY, m); } catch (e) { /* navigation privée */ }
+  }
+
   // ======================= Écouteurs =======================
   $('size').addEventListener('input', function () { $('sizeVal').textContent = this.value; });
   $('fg-mode').addEventListener('change', syncFgMode);
@@ -655,13 +715,22 @@
   $('sheetCount').addEventListener('input', sheetSchedule);
   $('sheet').addEventListener('toggle', function () { if (this.open) sheetRefresh(); });
   $('sheetPrint').addEventListener('click', sheetDoPrint);
+  $('wizPrev').addEventListener('click', function () { wizShow(wizStep - 1); });
+  $('wizNext').addEventListener('click', function () {
+    if (STEPS[wizStep].needData && !svg) { $('wizNote').textContent = 'Saisissez d\'abord un contenu pour continuer.'; return; }
+    if (wizStep === STEPS.length - 1) { $('wizNote').textContent = 'Terminé. Pensez à tester le code avec un téléphone avant de le diffuser.'; return; }
+    wizShow(wizStep + 1);
+  });
+  $('modeSwitch').addEventListener('change', function (e) { setMode(e.target.value); });
   $('goSheet').addEventListener('click', function () {
     var s = $('sheet'); s.open = true; sheetRefresh();
     s.scrollIntoView({ behavior: 'smooth', block: 'start' });
     s.querySelector('summary').focus({ preventScroll: true });
   });
-  $('tabs').closest('.panel').addEventListener('input', function () { clearTimeout(timer); timer = setTimeout(update, 120); });
+  $('main').addEventListener('input', function () { clearTimeout(timer); timer = setTimeout(update, 120); });
 
   enhanceColors(); linesCount(); loadLook();
   renderTabs(); renderFields(); renderPresets(); renderShapes(); renderIcons(); markIcons(); renderFrames(); markFrames(); update();
+  var savedMode; try { savedMode = localStorage.getItem(MODE_KEY); } catch (e) { /* navigation privée */ }
+  setMode(savedMode === 'full' ? 'full' : 'guided');   // 1re visite : pas à pas
 })();
