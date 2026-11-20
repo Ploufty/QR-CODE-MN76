@@ -605,3 +605,10 @@ legend { margin-bottom: .5rem; font-size: .9rem; font-weight: 700; }
 #wizSlot .sub > summary { display: none; }
 #wizSlot .sub > .opts, #wizSlot .sub > .icongrid, #wizSlot .sub > .logo-tools,
 #wizSlot .sub > .shapes, #wizSlot .sub > .hint-sm, #wizSlot .sub > .frame-switch { margin-inline: 0; }
+/* Dans l'assistant, les champs déplacés gardent la trame « libellé à gauche / contrôle à droite » */
+#wizSlot > label, #wizSlot > div.wide {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  gap: .4rem 1rem; min-height: 2.7rem; margin-bottom: .45rem; width: 100%;
+}
+#wizSlot > label > select, #wizSlot > label > input[type="text"] { width: 14rem; max-width: 100%; margin-top: 0; }
+#wizSlot > label > .seg.mini { width: 100%; }
