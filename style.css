@@ -305,11 +305,7 @@ legend { margin-bottom: .5rem; font-size: .9rem; font-weight: 700; }
 .hero p { margin-top: .7rem; font-size: 1rem; }
 
 /* Colonne réglages : centrée et lisible */
-.tool > .panel:first-child > .block,
-.tool > .panel:first-child > .typetabs,
-.tool > .panel:first-child > #fields,
-.tool > .panel:first-child > .cat-head-lite,
-.tool > .panel:first-child > #batch { max-width: 34rem; margin-inline: auto; }
+#content > *, #tools > * { max-width: 34rem; margin-inline: auto; }
 
 /* Sous-sections repliables */
 .sub { border: 1px solid var(--border); border-radius: .7rem; margin-top: .7rem; background: var(--bg); }
@@ -371,11 +367,7 @@ legend { margin-bottom: .5rem; font-size: .9rem; font-weight: 700; }
 .hero p { margin-top: .7rem; font-size: 1rem; }
 
 /* Colonne réglages : centrée et lisible */
-.tool > .panel:first-child > .block,
-.tool > .panel:first-child > .typetabs,
-.tool > .panel:first-child > #fields,
-.tool > .panel:first-child > .cat-head-lite,
-.tool > .panel:first-child > #batch { max-width: 34rem; margin-inline: auto; }
+#content > *, #tools > * { max-width: 34rem; margin-inline: auto; }
 
 /* Sous-sections repliables */
 .sub { border: 1px solid var(--border); border-radius: .7rem; margin-top: .7rem; background: var(--bg); }
@@ -547,3 +539,21 @@ legend { margin-bottom: .5rem; font-size: .9rem; font-weight: 700; }
   .print-cell img { width: 100%; height: 100%; display: block; }
   .print-sheet.cut .print-cell { outline: .25mm dashed #999; outline-offset: .5mm; }
 }
+
+/* ===== Ordre des colonnes : sur mobile l'aperçu passe juste sous le champ ===== */
+#content { grid-column: 1; grid-row: 1; }
+#tools { grid-column: 1; grid-row: 2; }
+.preview { grid-column: 2; grid-row: 1 / span 2; }
+@media (max-width: 860px) {
+  #content, #tools, .preview { grid-column: 1; grid-row: auto; }
+  #content { order: 1; } .preview { order: 2; } #tools { order: 3; }   /* le QR juste sous le champ */
+}
+/* Mobile : on dégage ce qui éloigne le QR du champ (l'accroche reste dans l'aide) */
+@media (max-width: 600px) {
+  .hero { padding: .6rem 0 .8rem; }
+  .hero p { display: none; }
+  #content > .cat-head-lite { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .typetabs { gap: .35rem; margin-bottom: .8rem; }
+}
+.colormenu-hex input { width: 100%; margin: 0; padding: .4rem .55rem; font-size: .85rem; font-family: ui-monospace, monospace; text-align: center; }
+.hint-btn { width: 1.6rem; height: 1.6rem; font-size: .85rem; }

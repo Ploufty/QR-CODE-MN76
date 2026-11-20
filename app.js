@@ -175,10 +175,20 @@
       };
       grid.appendChild(s);
     });
+    var hexWrap = document.createElement('label'); hexWrap.className = 'colormenu-hex';
+    hexWrap.innerHTML = '<span class="sr-only">Code hexadécimal</span>';
+    var hex = document.createElement('input');
+    hex.type = 'text'; hex.maxLength = 7; hex.placeholder = '#RRGGBB'; hex.spellcheck = false;
+    hex.addEventListener('input', function () {
+      var v = this.value.trim();
+      if (/^#[0-9a-fA-F]{6}$/.test(v) && cmenuInput) { cmenuInput.value = v; cmenuInput.dispatchEvent(new Event('input', { bubbles: true })); }
+    });
+    hexWrap.appendChild(hex); cmenu.hexInput = hex;
+
     var custom = document.createElement('button');
     custom.type = 'button'; custom.className = 'btn btn-ghost colormenu-custom'; custom.innerHTML = BRUSH + '<span>Couleur libre…</span>';
     custom.onclick = function () { var i = cmenuInput; closeColorMenu(); if (i) i.click(); };
-    cmenu.appendChild(grid); cmenu.appendChild(custom);
+    cmenu.appendChild(grid); cmenu.appendChild(hexWrap); cmenu.appendChild(custom);
     document.body.appendChild(cmenu);
     document.addEventListener('click', function (e) { if (cmenu.hidden) return; if (!cmenu.contains(e.target) && !e.target.closest('.colorchip')) closeColorMenu(); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeColorMenu(); });
@@ -191,11 +201,14 @@
     closeColorMenu();
     cmenuInput = inp; chip.setAttribute('aria-expanded', 'true');
     cmenu.hidden = false;
-    var r = chip.getBoundingClientRect(), w = cmenu.offsetWidth;
+    var r = chip.getBoundingClientRect(), w = cmenu.offsetWidth, hgt = cmenu.offsetHeight;
     var left = Math.min(Math.max(8, r.left + scrollX), scrollX + innerWidth - w - 8);
+    // si le menu dépasserait le bas de l'écran, on l'ouvre au-dessus du bouton
+    var below = r.bottom + 6 + hgt <= innerHeight;
     cmenu.style.left = left + 'px';
-    cmenu.style.top = (r.bottom + scrollY + 6) + 'px';
-    cmenu.querySelector('.swatch').focus();
+    cmenu.style.top = (below ? r.bottom + scrollY + 6 : r.top + scrollY - hgt - 6) + 'px';
+    if (cmenu.hexInput) cmenu.hexInput.value = inp.value;
+    cmenu.querySelector('.swatch').focus({ preventScroll: true });   // sinon le défilement induit referme le menu
   }
   function enhanceColors() {
     ['fg', 'g1', 'g2', 'bgcol', 'csColor', 'cdColor', 'logoColor', 'frameColor', 'frameTextColor'].forEach(function (id) {
@@ -334,7 +347,10 @@
   }
   // Construit le SVG (source unique). Légende ou cadre ajoutés ensuite.
   function buildSVG(data, withCaption) {
-    var q = new QRCodeStyling(qrOptions(data));
+    var q;
+    // la bibliothèque lève de façon synchrone (ex. « code length overflow ») :
+    // sans ce try, l'exception échappe à la chaîne de promesses et l'état d'erreur ne s'affiche jamais
+    try { q = new QRCodeStyling(qrOptions(data)); } catch (e) { return Promise.reject(e); }
     return q.getRawData('svg').then(function (blob) { return blob.text(); }).then(function (s) {
       var text = $('caption').value.trim();
       if ($('frameOn').checked) return framed(s, text || 'SCANNEZ-MOI');
@@ -352,18 +368,27 @@
     });
   }
 
+  var annTimer;
+  function qrLabel(data) { return TYPES[type].label + ' : ' + data.replace(/\s+/g, ' ').slice(0, 60); }
+  function announce(t) { clearTimeout(annTimer); annTimer = setTimeout(function () { $('announce').textContent = t; }, 600); }
+
   function setButtons(ok) { ['dlPng', 'dlSvg', 'copy', 'print'].forEach(function (id) { $(id).disabled = !ok; }); }
 
   function update() {
+    saveLook();
     var data = TYPES[type].build(values());
     if (!data) { svg = ''; setButtons(false); $('out').innerHTML = '<p class="out-empty">Remplissez le formulaire pour voir le QR code.</p>'; sheetSchedule(); return; }
     var my = ++token;
     buildSVG(data, true).then(function (s) {
       if (my !== token) return;
       svg = s; $('out').innerHTML = s; $('msg').textContent = ''; setButtons(true); sheetSchedule();
+      var sv = $('out').querySelector('svg');
+      if (sv) { sv.setAttribute('role', 'img'); sv.setAttribute('aria-label', 'QR code — ' + qrLabel(data)); }
+      announce('QR code prêt, ' + qrLabel(data));
     }).catch(function () {
       if (my !== token) return;
       svg = ''; setButtons(false); $('out').innerHTML = '<p class="out-empty">Contenu trop long pour un QR code.</p>';
+      announce('Contenu trop long pour un QR code.');
     });
   }
 
@@ -378,6 +403,7 @@
     $('frameOn').checked = false; $('frameOpts').hidden = true; frameStyle = 'classic'; setVal('frameColor', '#000000'); setVal('frameTextColor', '#ffffff'); markFrames();
     $('caption').value = ''; document.querySelector('input[name=bgmode][value=opaque]').checked = true; $('ec').value = 'M';
     $('size').value = 1024; $('sizeVal').textContent = '1024';
+    try { localStorage.removeItem(LOOK_KEY); } catch (e) { /* navigation privée */ }
     update();
   }
 
@@ -405,8 +431,8 @@
   function clean(s) { return (s || '').replace(/[\\/:*?"<>|\x00-\x1f]/g, '').trim().slice(0, 60); }
   function fileName() { return clean($('fname').value) || 'qrcode'; }
 
-  $('dlPng').onclick = function () { toPNG(function (b) { save(b, fileName() + '.png'); }); };
-  $('dlSvg').onclick = function () { save(new Blob([svg], { type: 'image/svg+xml' }), fileName() + '.svg'); };
+  $('dlPng').onclick = function () { toPNG(function (b) { save(b, fileName() + '.png'); say('PNG téléchargé : ' + fileName() + '.png'); }); };
+  $('dlSvg').onclick = function () { save(new Blob([svg], { type: 'image/svg+xml' }), fileName() + '.svg'); say('SVG téléchargé : ' + fileName() + '.svg'); };
   $('copy').onclick = function () {
     toPNG(function (b) {
       navigator.clipboard.write([new ClipboardItem({ 'image/png': b })]).then(function () { say('Copié !'); }, function () { say('Copie impossible, utilisez PNG.'); });
@@ -454,6 +480,11 @@
   function parseLines(txt) {
     return txt.split(/\r?\n/).map(function (l) { var p = l.split(l.indexOf('\t') >= 0 ? '\t' : ';'); return [p[0].trim(), clean(p[1])]; })
       .filter(function (p) { return p[0]; }).slice(0, 200);
+  }
+  function linesCount() {
+    var n = parseLines($('lines').value).length, raw = $('lines').value.split(/\r?\n/).filter(function (l) { return l.trim(); }).length;
+    $('linesCount').textContent = n + ' ligne' + (n > 1 ? 's' : '') + ' comprise' + (n > 1 ? 's' : '') +
+      (raw > n ? ' sur ' + raw + ' (200 maximum)' : ' (200 maximum)');
   }
   $('csv').onchange = function () {
     var f = this.files[0], r = new FileReader();
@@ -550,6 +581,42 @@
     }).catch(function (e) { say(e.message || 'Impression impossible.'); });
   }
 
+  // ======================= Mémoire de l'apparence =======================
+  var LOOK_KEY = 'qr-mn76-look', HEX = /^#[0-9a-f]{6}$/i;
+  var COLOR_IDS = ['fg', 'g1', 'g2', 'csColor', 'cdColor', 'bgcol', 'logoColor', 'frameColor', 'frameTextColor'];
+  var DOT_VALS = DOT_TYPES.map(function (o) { return o[0]; }), CS_VALS = ['square', 'dot', 'extra-rounded'];
+  function saveLook() {
+    try {
+      localStorage.setItem(LOOK_KEY, JSON.stringify({
+        fgmode: fgMode(), gradType: $('gradType').value, ec: $('ec').value,
+        dots: shape.dotsType, cs: shape.csType, cd: shape.cdType,
+        logoIcon: logoIcon, frameOn: $('frameOn').checked, frameStyle: frameStyle,
+        bgmode: pick('bgmode'), size: $('size').value,
+        colors: COLOR_IDS.reduce(function (o, id) { o[id] = $(id).value; return o; }, {})
+      }));
+    } catch (e) { /* navigation privée */ }
+  }
+  // Les valeurs relues sont validées : le stockage du navigateur est modifiable par l'utilisateur
+  function loadLook() {
+    var v; try { v = JSON.parse(localStorage.getItem(LOOK_KEY)); } catch (e) { return; }
+    if (!v || typeof v !== 'object') return;
+    if (v.colors) COLOR_IDS.forEach(function (id) { if (HEX.test(v.colors[id] || '')) setVal(id, v.colors[id]); });
+    if (v.fgmode === 'single' || v.fgmode === 'gradient') { document.querySelector('input[name=fgmode][value=' + v.fgmode + ']').checked = true; }
+    if (v.gradType === 'linear' || v.gradType === 'radial') $('gradType').value = v.gradType;
+    if (['L', 'M', 'Q', 'H'].indexOf(v.ec) >= 0) $('ec').value = v.ec;
+    if (DOT_VALS.indexOf(v.dots) >= 0) shape.dotsType = v.dots;
+    if (CS_VALS.indexOf(v.cs) >= 0) shape.csType = v.cs;
+    if (DOT_VALS.indexOf(v.cd) >= 0) shape.cdType = v.cd;
+    if (typeof v.logoIcon === 'number' && v.logoIcon >= 0 && v.logoIcon < ICONS.length) {
+      logoIcon = v.logoIcon; logoURL = iconURL(ICONS[logoIcon][1], $('logoColor').value);
+    }
+    if (v.frameOn === true) { $('frameOn').checked = true; $('frameOpts').hidden = false; }
+    if (['classic', 'top', 'ribbon', 'pill'].indexOf(v.frameStyle) >= 0) frameStyle = v.frameStyle;
+    if (v.bgmode === 'opaque' || v.bgmode === 'transparent') document.querySelector('input[name=bgmode][value=' + v.bgmode + ']').checked = true;
+    var s = +v.size; if (s >= 256 && s <= 2048) { $('size').value = s; $('sizeVal').textContent = s; }
+    syncFgMode();
+  }
+
   // ======================= Écouteurs =======================
   $('size').addEventListener('input', function () { $('sizeVal').textContent = this.value; });
   $('fg-mode').addEventListener('change', syncFgMode);
@@ -566,12 +633,13 @@
       sheetRefresh();
     });
   });
+  $('lines').addEventListener('input', linesCount);
   $('sheetCut').addEventListener('change', sheetRefresh);
   $('sheetCount').addEventListener('input', sheetSchedule);
   $('sheet').addEventListener('toggle', function () { if (this.open) sheetRefresh(); });
   $('sheetPrint').addEventListener('click', sheetDoPrint);
   $('tabs').closest('.panel').addEventListener('input', function () { clearTimeout(timer); timer = setTimeout(update, 120); });
 
-  enhanceColors();
-  renderTabs(); renderFields(); renderPresets(); renderShapes(); renderIcons(); renderFrames(); update();
+  enhanceColors(); linesCount(); loadLook();
+  renderTabs(); renderFields(); renderPresets(); renderShapes(); renderIcons(); markIcons(); renderFrames(); markFrames(); update();
 })();

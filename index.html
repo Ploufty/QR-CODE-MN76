@@ -52,11 +52,16 @@
   <main class="main container" id="main">
     <div class="tool">
       <!-- Formulaire -->
-      <section class="panel" aria-labelledby="t-form">
+      <section class="panel" id="content" aria-labelledby="t-form">
         <h2 id="t-form" class="cat-head-lite">Contenu</h2>
 
         <div class="typetabs" id="tabs" role="tablist" aria-label="Type de QR code"></div>
         <div id="fields" class="fields"></div>
+      </section>
+
+      <!-- Outils (apparence, lot, planche) -->
+      <section class="panel" id="tools" aria-labelledby="t-tools">
+        <h2 id="t-tools" class="sr-only">Options du QR code</h2>
 
         <details class="block" open>
           <summary>Personnaliser l'apparence</summary>
@@ -146,6 +151,7 @@
           <label>Une ligne par QR code, au format <code>contenu;nom du fichier</code> (le nom est facultatif)
             <textarea id="lines" rows="5" placeholder="https://exemple.fr;accueil&#10;https://exemple.fr/rh;rh"></textarea>
           </label>
+          <p id="linesCount" class="sheet-info" role="status" aria-live="polite">0 ligne comprise (200 maximum)</p>
           <label class="wide">…ou importer un fichier .csv / .txt
             <input type="file" id="csv" accept=".csv,.txt">
           </label>
@@ -215,6 +221,7 @@
           <button id="print" class="btn btn-ghost" disabled>Imprimer</button>
         </div>
         <p id="msg" class="msg" role="status" aria-live="polite"></p>
+        <p id="announce" class="sr-only" role="status" aria-live="polite"></p>
       </section>
 
     </div>
