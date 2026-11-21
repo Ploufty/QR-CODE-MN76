@@ -174,6 +174,8 @@
         <details class="block" id="multi">
           <summary>Plusieurs codes à la fois</summary>
           <p class="hint-sm">Une ligne par code. <b>L'apparence choisie au-dessus s'applique à tous les codes de la liste.</b></p>
+          <button type="button" id="addCurrent" class="btn btn-ghost full">+ Ajouter le code affiché à la liste</button>
+          <p class="hint-sm" id="addNote" role="status" aria-live="polite"></p>
           <label>Vos contenus, au format <code>contenu;nom du fichier</code> (le nom est facultatif)
             <textarea id="lines" rows="5" placeholder="https://exemple.fr;accueil&#10;https://exemple.fr/rh;rh"></textarea>
           </label>
@@ -268,6 +270,12 @@
         </button>
       </div>
       <div class="help">
+        <details><summary>Lier un code à une liste</summary>
+          <p>Le bouton <b>« + Ajouter le code affiché à la liste »</b>, dans <b>Plusieurs codes à la fois</b>, verse le code que vous venez de composer dans la liste, avec le nom du champ « Nom du fichier ». Pratique pour construire une série sans retaper les contenus à la main : composez, ajoutez, recommencez.</p>
+          <p>Deux limites à connaître :</p>
+          <ul><li>Un <b>contact (vCard)</b> occupe plusieurs lignes : il ne peut pas entrer dans une liste ligne par ligne. Exportez-le seul en PNG ou SVG.</li>
+          <li>Les contenus qui contiennent des <code>;</code> (comme le Wi-Fi) sont ajoutés avec une <b>tabulation</b> comme séparateur, pour ne pas être coupés. Si vous saisissez ce genre de contenu à la main, collez depuis un tableur plutôt que de taper un <code>;</code>.</li></ul></details>
+
         <details><summary>Les deux modes</summary>
           <p>En haut de la page, deux modes au choix — votre préférence est retenue sur cet appareil :</p>
           <ul><li><b>Pas à pas</b> : l'outil vous guide en 5 étapes, avec une explication à chaque fois et un « En savoir plus » si vous voulez le détail. C'est le mode conseillé la première fois.</li>

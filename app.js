@@ -662,28 +662,28 @@
   // chacun gardant ses écouteurs et son état. Un repère (commentaire) marque leur place d'origine.
   var MODE_KEY = 'qr-mn76-mode', wizStep = 0;
   var STEPS = [
-    { title: 'Que doit faire votre QR code ?',
+    { phase: 'Contenu', title: 'Que doit faire votre QR code ?',
       help: 'Choisissez ce qui se passera quand quelqu\'un le scannera avec son téléphone.',
       more: "Un QR code contient du texte. Selon la façon dont ce texte est écrit, le téléphone comprend qu'il s'agit d'un site, d'un réseau Wi-Fi, d'un contact… et propose l'action correspondante. C'est tout ce que change ce choix.",
       nodes: ['#tabs'] },
-    { title: 'Votre contenu',
+    { phase: 'Contenu', title: 'Votre contenu',
       help: '', more: '', nodes: ['#fields'], needData: true },
-    { title: 'L\'allure (facultatif)',
+    { phase: 'Apparence', title: 'L\'allure (facultatif)',
       help: 'Cliquez un modèle pour tout changer d\'un coup, ou réglez vous-même les couleurs juste en dessous.',
       more: "Gardez un fort contraste : code foncé sur fond clair. C'est ce qui garantit qu'il sera lu par tous les téléphones, même anciens, même mal imprimé. Le premier modèle est le style classique, le plus sûr. « Dégradé » fait passer les modules d'une couleur à l'autre ; pour régler aussi la forme des modules et des marqueurs, basculez en mode Complet.",
       nodes: ['#presets', '#fgModeRow', '#fg-single-1', '#fg-grad-1', '#fg-grad-2', '#fg-grad-type', '#bgColorRow'] },
-    { title: 'Un logo au centre (facultatif)',
+    { phase: 'Apparence', title: 'Un logo au centre (facultatif)',
       help: 'Choisissez une icône, ou importez votre propre image (logo de l\'école, de la collectivité…).',
       more: "Dès qu'un logo est présent, la correction d'erreur passe au maximum pour compenser la zone masquée : le code reste lisible. Évitez les images très claires ou très détaillées, et testez toujours le scan après avoir ajouté un logo. « Retirer » revient à un code sans logo.",
       nodes: ['#subLogo'] },
-    { title: 'Un cadre avec un message (facultatif)',
+    { phase: 'Apparence', title: 'Un cadre avec un message (facultatif)',
       help: 'Un cadre avec « Scannez-moi » augmente nettement le nombre de personnes qui scannent une affiche.',
       more: "Cochez « Encadrer le QR », ou cliquez directement un exemple. Le texte affiché est celui du champ ci-dessus (40 caractères maximum). Attention : un cadre remplit toute l'image, l'export ne pourra donc pas être transparent.",
       nodes: ['#subFrame'] },
-    { title: 'Récupérer votre QR code',
+    { phase: 'Récupérer', title: 'Récupérer votre QR code',
       help: 'Votre code est prêt, à droite (ou juste au-dessus sur téléphone). Choisissez le format et téléchargez-le.',
-      more: "PNG pour un document ou un écran ; SVG pour l'imprimeur, car il s'agrandit sans perte. Le curseur règle la taille du PNG. Pour en imprimer plusieurs à découper sur une page A4, ou pour créer plusieurs codes d'un coup, utilisez « Plusieurs codes à la fois ». Testez toujours le code avec un téléphone avant de le diffuser.",
-      nodes: [] }
+      more: "PNG pour un document ou un écran ; SVG pour l'imprimeur, car il s'agrandit sans perte. Le curseur règle la taille du PNG. Le bloc « Plusieurs codes à la fois » sert à en produire une série : « Ajouter le code affiché » verse le code en cours dans la liste, puis vous choisissez une archive ZIP ou une planche A4 à découper. L'apparence réglée aux étapes précédentes s'applique à tous. Testez toujours le code avec un téléphone avant de le diffuser.",
+      nodes: ['#multi'] }
   ];
   function wizTake(sel) {
     var n = document.querySelector(sel); if (!n) return;
@@ -701,7 +701,7 @@
     wizReturn();
     wizStep = Math.max(0, Math.min(STEPS.length - 1, i));
     var s = STEPS[wizStep];
-    $('wizProgress').textContent = 'Étape ' + (wizStep + 1) + ' sur ' + STEPS.length;
+    $('wizProgress').textContent = 'Étape ' + (wizStep + 1) + ' sur ' + STEPS.length + ' — ' + s.phase;
     $('wizFill').style.width = ((wizStep + 1) / STEPS.length * 100) + '%';
     $('wizTitle').textContent = s.title;
     var help = s.help, more = s.more;
@@ -750,6 +750,19 @@
       sheetRefresh();
     });
   });
+  // Pont entre le formulaire riche et la liste : on y verse le code en cours.
+  // Séparateur tabulation, car un contenu Wi-Fi contient des « ; » que la liste découperait.
+  $('addCurrent').addEventListener('click', function () {
+    var data = TYPES[type].build(values());
+    if (!data) return void ($('addNote').textContent = 'Saisissez d\'abord un contenu à ajouter.');
+    if (data.indexOf('\n') >= 0) return void ($('addNote').textContent = 'Un contact tient sur plusieurs lignes : il ne peut pas entrer dans la liste. Exportez-le seul en PNG ou SVG.');
+    var rows = parseLines($('lines').value);
+    if (rows.length >= 200) return void ($('addNote').textContent = 'La liste est pleine (200 codes maximum).');
+    var cur = $('lines').value.replace(/\s*$/, '');
+    $('lines').value = (cur ? cur + '\n' : '') + data + '\t' + fileName();
+    linesCount(); sheetSchedule();
+    $('addNote').textContent = 'Ajouté : « ' + fileName() + ' ». La liste compte ' + parseLines($('lines').value).length + ' code(s).';
+  });
   $('lines').addEventListener('input', function () { linesCount(); sheetSchedule(); });
   $('sheetCut').addEventListener('change', sheetRefresh);
   $('sheetCount').addEventListener('input', sheetSchedule);
@@ -763,6 +776,7 @@
   });
   $('modeSwitch').addEventListener('change', function (e) { setMode(e.target.value); });
   $('goSheet').addEventListener('click', function () {
+    if (!$('wizard').hidden) wizShow(STEPS.length - 1);   // l'assistant doit d'abord amener le bloc à l'écran
     var s = $('sheet'); $('multi').open = true; s.open = true; sheetRefresh();
     s.scrollIntoView({ behavior: 'smooth', block: 'start' });
     s.querySelector('summary').focus({ preventScroll: true });
