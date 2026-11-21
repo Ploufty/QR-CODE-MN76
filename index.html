@@ -171,30 +171,26 @@
           </details>
         </details>
 
-        <details class="block" id="batch">
-          <summary>Génération en lot</summary>
-          <label>Une ligne par QR code, au format <code>contenu;nom du fichier</code> (le nom est facultatif)
+        <details class="block" id="multi">
+          <summary>Plusieurs codes à la fois</summary>
+          <p class="hint-sm">Une ligne par code. <b>L'apparence choisie au-dessus s'applique à tous les codes de la liste.</b></p>
+          <label>Vos contenus, au format <code>contenu;nom du fichier</code> (le nom est facultatif)
             <textarea id="lines" rows="5" placeholder="https://exemple.fr;accueil&#10;https://exemple.fr/rh;rh"></textarea>
           </label>
           <p id="linesCount" class="sheet-info" role="status" aria-live="polite">0 ligne comprise (200 maximum)</p>
           <label class="wide">…ou importer un fichier .csv / .txt
             <input type="file" id="csv" accept=".csv,.txt">
           </label>
-          <button type="button" id="zip" class="btn full">Télécharger l'archive ZIP</button>
-        </details>
 
-        <details class="block" id="sheet">
-          <summary>Planche à imprimer</summary>
+          <p class="picklabel multi-out">Que faire de ces codes ?</p>
+          <button type="button" id="zip" class="btn full">Télécharger l'archive ZIP (PNG + SVG)</button>
+
+          <details class="sub" id="sheet">
+            <summary>…ou les imprimer sur une planche A4 à découper</summary>
+            <p class="hint-sm" id="sheetSourceNote" role="status" aria-live="polite"></p>
           <p class="hint-sm">Remplit une page A4 de QR codes à découper. L'impression du navigateur permet aussi d'enregistrer en PDF.</p>
 
           <div class="opts">
-            <div class="wide pickwrap"><span class="picklabel">Que mettre sur la planche</span>
-              <span class="seg" id="sheetSource">
-                <label><input type="radio" name="sheetsrc" value="one" checked><span>Le QR affiché</span></label>
-                <label><input type="radio" name="sheetsrc" value="list"><span>La liste du lot</span></label>
-              </span>
-            </div>
-
             <div class="wide pickwrap"><span class="picklabel">Taille d'un QR code</span>
               <span class="seg" id="sheetSize">
                 <label><input type="radio" name="sheetsize" value="20"><span>2 cm</span></label>
@@ -223,7 +219,9 @@
           <button type="button" id="sheetPrint" class="btn full">Imprimer la planche</button>
           <p class="hint-sm credit">Idée de la planche à imprimer inspirée de
             <a href="https://qrprint.forge.apps.education.fr/app/" target="_blank" rel="noopener">QRPrint</a> ; code écrit pour cet outil.</p>
+          </details>
         </details>
+
       </section>
 
       <!-- Aperçu -->
@@ -335,21 +333,20 @@
           <li><b>Fond</b> : <b>Avec fond</b> utilise la couleur de fond choisie (blanc par défaut) ; <b>Transparent</b> supprime le fond, utile pour poser le code sur une image ou un aplat de couleur.</li>
           <li>Le champ <b>Nom du fichier</b> définit le nom de tous les téléchargements.</li></ul></details>
 
-        <details><summary>Génération en lot</summary>
-          <p>Pour créer plusieurs QR codes d'un coup (une classe, une série de salles, une liste de liens).</p>
-          <ol><li>Ouvrez <b>Génération en lot</b>.</li>
-          <li>Saisissez <b>une ligne par QR code</b>, au format <code>contenu;nom du fichier</code> (le nom est facultatif).</li>
-          <li>Vous pouvez aussi coller depuis un tableur (colonnes séparées par une tabulation) ou importer un fichier <code>.csv</code> / <code>.txt</code>.</li>
-          <li>Cliquez <b>Télécharger l'archive ZIP</b>.</li></ol>
+        <details><summary>Plusieurs codes à la fois</summary>
+          <p>Pour créer plusieurs QR codes d'un coup (une classe, une série de salles, une liste de liens) — et, si besoin, les imprimer sur une planche à découper.</p>
+          <ol><li>Ouvrez <b>Plusieurs codes à la fois</b>.</li>
+          <li>Saisissez <b>une ligne par code</b>, au format <code>contenu;nom du fichier</code> (le nom est facultatif). Vous pouvez aussi coller depuis un tableur ou importer un <code>.csv</code>.</li>
+          <li>Choisissez ensuite ce que vous en faites : <b>archive ZIP</b> (chaque code en PNG et SVG) ou <b>planche A4</b>.</li></ol>
           <pre>https://exemple.fr;accueil
 https://exemple.fr/rh;rh
 Bonjour !;message</pre>
-          <p>Maximum 200 lignes. Le ZIP contient chaque code en <b>PNG et SVG</b>, avec l'apparence choisie au-dessus. Les noms en double reçoivent un suffixe (<code>accueil</code>, <code>accueil-2</code>).</p></details>
+          <p><b>L'apparence choisie plus haut s'applique à tous les codes de la liste</b> : couleurs, formes, logo, cadre. Maximum 200 lignes ; les noms en double reçoivent un suffixe (<code>accueil</code>, <code>accueil-2</code>).</p></details>
 
         <details><summary>Planche à imprimer</summary>
           <p>Remplit une page A4 de QR codes à découper : pratique pour distribuer un même code à toute une classe, ou pour étiqueter une série de lieux.</p>
-          <ol><li>Ouvrez <b>Planche à imprimer</b>, en bas des réglages.</li>
-          <li>Choisissez ce qui va dessus : <b>le QR affiché</b> (répété) ou <b>la liste du lot</b> (un code par ligne).</li>
+          <ol><li>Dans <b>Plusieurs codes à la fois</b>, ouvrez <b>…ou les imprimer sur une planche A4 à découper</b>.</li>
+          <li>La planche se remplit toute seule : <b>avec les codes de votre liste</b> s'il y en a une, sinon en <b>répétant le QR code affiché</b> (une ligne vous indique lequel des deux s'applique).</li>
           <li>Choisissez la <b>taille d'un QR</b> (2 à 5 cm) et l'<b>orientation</b> : l'outil calcule combien en tiennent par page et l'affiche (par ex. « 5 × 8 = 40 QR par page »).</li>
           <li>Gardez les <b>repères de découpe</b> si vous comptez découper au massicot ou aux ciseaux.</li>
           <li><b>Imprimer la planche</b> : dans la boîte d'impression, vous pouvez aussi choisir « Enregistrer en PDF ».</li></ol>

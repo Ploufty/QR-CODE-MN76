@@ -640,3 +640,6 @@ legend { margin-bottom: .5rem; font-size: .9rem; font-weight: 700; }
 }
 #sheet.flash { border-radius: .7rem; animation: flash3 .75s ease-in-out 3; }
 #sheet.flash > summary { color: var(--primaire); }
+.multi-out { margin: 1.1rem 0 .5rem; }
+#multi > .sub { margin-top: .9rem; }
+#sheetSourceNote { margin-bottom: .8rem; }

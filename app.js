@@ -555,8 +555,9 @@
     return { size: size, orient: orient, page: page, cols: cols, rows: rows, perPage: cols * rows };
   }
   // Rassemble les SVG à poser sur la planche
+  function sheetUsesList() { return parseLines($('lines').value).length > 0; }
   function sheetItems(limit) {
-    if (pick('sheetsrc') === 'list') {
+    if (sheetUsesList()) {
       var rows = parseLines($('lines').value);
       if (!rows.length) return Promise.reject(new Error('La liste du lot est vide.'));
       if (limit) rows = rows.slice(0, limit);
@@ -569,7 +570,10 @@
   }
 
   function sheetRefresh() {
-    var o = sheetOpts(), list = pick('sheetsrc') === 'list';
+    var o = sheetOpts(), list = sheetUsesList();
+    $('sheetSourceNote').textContent = list
+      ? 'La planche reprend les ' + parseLines($('lines').value).length + ' codes de la liste ci-dessus.'
+      : 'La liste est vide : la planche répète le QR code affiché. Ajoutez des lignes au-dessus pour imprimer des codes différents.';
     $('sheetCountRow').hidden = list;
     var n = list ? parseLines($('lines').value).length : Math.max(1, Math.min(500, +$('sheetCount').value || 1));
     var pages = Math.max(1, Math.ceil(n / o.perPage));
@@ -678,7 +682,7 @@
       nodes: ['#subFrame'] },
     { title: 'Récupérer votre QR code',
       help: 'Votre code est prêt, à droite (ou juste au-dessus sur téléphone). Choisissez le format et téléchargez-le.',
-      more: "PNG pour un document ou un écran ; SVG pour l'imprimeur, car il s'agrandit sans perte. Le curseur règle la taille du PNG. Pour en imprimer plusieurs à découper sur une page A4, utilisez « Ouvrir la planche à imprimer ». Testez toujours le code avec un téléphone avant de le diffuser.",
+      more: "PNG pour un document ou un écran ; SVG pour l'imprimeur, car il s'agrandit sans perte. Le curseur règle la taille du PNG. Pour en imprimer plusieurs à découper sur une page A4, ou pour créer plusieurs codes d'un coup, utilisez « Plusieurs codes à la fois ». Testez toujours le code avec un téléphone avant de le diffuser.",
       nodes: [] }
   ];
   function wizTake(sel) {
@@ -740,13 +744,13 @@
   });
   $('bgMode').addEventListener('change', update);   // dans le panneau Aperçu, hors de l'écouteur du formulaire
   $('resetBtn').addEventListener('click', reset);
-  ['sheetSource', 'sheetSize', 'sheetOrient'].forEach(function (id) {
+  ['sheetSize', 'sheetOrient'].forEach(function (id) {
     $(id).addEventListener('change', function () {
-      if (id !== 'sheetSource') $('sheetCount').value = sheetOpts().perPage;   // nouvelle capacité de page
+      $('sheetCount').value = sheetOpts().perPage;   // nouvelle capacité de page
       sheetRefresh();
     });
   });
-  $('lines').addEventListener('input', linesCount);
+  $('lines').addEventListener('input', function () { linesCount(); sheetSchedule(); });
   $('sheetCut').addEventListener('change', sheetRefresh);
   $('sheetCount').addEventListener('input', sheetSchedule);
   $('sheet').addEventListener('toggle', function () { if (this.open) sheetRefresh(); });
@@ -759,7 +763,7 @@
   });
   $('modeSwitch').addEventListener('change', function (e) { setMode(e.target.value); });
   $('goSheet').addEventListener('click', function () {
-    var s = $('sheet'); s.open = true; sheetRefresh();
+    var s = $('sheet'); $('multi').open = true; s.open = true; sheetRefresh();
     s.scrollIntoView({ behavior: 'smooth', block: 'start' });
     s.querySelector('summary').focus({ preventScroll: true });
     s.classList.remove('flash'); void s.offsetWidth; s.classList.add('flash');   // on montre où on vient d'arriver
