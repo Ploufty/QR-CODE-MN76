@@ -22,15 +22,15 @@
   };
 
   // ---- Couleurs prédéfinies (swatches communs)
-  var COLORS = ['#000000', '#ffffff', '#166534', '#6d28d9', '#c2185b', '#0b5394', '#00727a', '#e1000f', '#f59e0b', '#1e1e2f'];
+  var COLORS = ['#000000', '#ffffff', '#3e54d3', '#0e7c7b', '#c2185b', '#0b5394', '#00727a', '#e1000f', '#f59e0b', '#1e1e2f'];
   var BRUSH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4l5 5-9 9H6v-5z"/><path d="M4 20h4"/></svg>';
 
   // ---- Modèles rapides (variés : montrent formes et marqueurs disponibles)
   var PRESETS = [
     { name: 'Classique', fg: '#000000', dots: 'square', cs: 'square', cd: 'square', eye: '#000000', bg: '#ffffff' },
-    { name: 'Points verts', fg: '#166534', dots: 'dots', cs: 'extra-rounded', cd: 'dot', eye: '#166534', bg: '#ffffff' },
-    { name: 'Arrondi violet', fg: '#6d28d9', dots: 'rounded', cs: 'extra-rounded', cd: 'extra-rounded', eye: '#6d28d9', bg: '#ffffff' },
-    { name: 'Dégradé élégant', grad: ['#166534', '#6d28d9', 'linear'], dots: 'classy-rounded', cs: 'extra-rounded', cd: 'classy', eye: '#166534', bg: '#ffffff' },
+    { name: 'Points indigo', fg: '#3e54d3', dots: 'dots', cs: 'extra-rounded', cd: 'dot', eye: '#3e54d3', bg: '#ffffff' },
+    { name: 'Arrondi turquoise', fg: '#0e7c7b', dots: 'rounded', cs: 'extra-rounded', cd: 'extra-rounded', eye: '#0e7c7b', bg: '#ffffff' },
+    { name: 'Dégradé élégant', grad: ['#3e54d3', '#0e7c7b', 'linear'], dots: 'classy-rounded', cs: 'extra-rounded', cd: 'classy', eye: '#3e54d3', bg: '#ffffff' },
     { name: 'Framboise', fg: '#c2185b', dots: 'classy', cs: 'dot', cd: 'dot', eye: '#c2185b', bg: '#ffffff' },
     { name: 'Nuit inversée', fg: '#eeeef6', dots: 'extra-rounded', cs: 'square', cd: 'dot', eye: '#7fb3ff', bg: '#11111b' }
   ];
@@ -43,10 +43,10 @@
   // ---- Exemples de cadre (clic = active le cadre + applique style et couleurs ; noir par défaut)
   var FRAMES = [
     { name: 'Noir', style: 'classic', fcol: '#000000', tcol: '#ffffff' },
-    { name: 'Vert', style: 'classic', fcol: '#166534', tcol: '#ffffff' },
-    { name: 'Texte en haut', style: 'top', fcol: '#6d28d9', tcol: '#ffffff' },
+    { name: 'Indigo', style: 'classic', fcol: '#3e54d3', tcol: '#ffffff' },
+    { name: 'Texte en haut', style: 'top', fcol: '#0e7c7b', tcol: '#ffffff' },
     { name: 'Ruban', style: 'ribbon', fcol: '#1e1e2f', tcol: '#ffffff' },
-    { name: 'Pilule', style: 'pill', fcol: '#166534', tcol: '#ffffff' },
+    { name: 'Pilule', style: 'pill', fcol: '#3e54d3', tcol: '#ffffff' },
     { name: 'Framboise', style: 'classic', fcol: '#c2185b', tcol: '#ffffff' },
     { name: 'Rond', style: 'circle', fcol: '#000000', tcol: '#ffffff' }
   ];
@@ -433,7 +433,7 @@
   function reset() {
     document.querySelector('input[name=fgmode][value=single]').checked = true; syncFgMode();
     setVal('fg', '#000000'); setVal('bgcol', '#ffffff'); setVal('csColor', '#000000'); setVal('cdColor', '#000000');
-    setVal('logoColor', '#000000'); setVal('g1', '#166534'); setVal('g2', '#6d28d9'); $('gradType').value = 'linear';
+    setVal('logoColor', '#000000'); setVal('g1', '#3e54d3'); setVal('g2', '#0e7c7b'); $('gradType').value = 'linear';
     shape = { dotsType: 'square', csType: 'square', cdType: 'square' }; markShapes();
     logoURL = ''; logoIcon = -1; $('logo').value = ''; markIcons();
     $('frameOn').checked = false; $('frameOpts').hidden = true; frameStyle = 'classic'; setVal('frameColor', '#000000'); setVal('frameTextColor', '#ffffff'); markFrames();
