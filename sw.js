@@ -1,6 +1,6 @@
 /* QR codes MN76 — service worker : réseau d'abord pour les pages, cache pour le reste.
    Permet d'utiliser l'application hors ligne une fois visitée. */
-const CACHE = 'qr-mn76-v1';
+const CACHE = 'qr-mn76-v2';
 const ASSETS = [
   './', './index.html', './style.css', './app.js', './ui.js', './prefs.js',
   './qr-code-styling.js', './icon.svg', './manifest.webmanifest',

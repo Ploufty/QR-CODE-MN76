@@ -148,7 +148,7 @@
             <div class="icongrid" id="icongrid" role="group" aria-label="Icônes de logo"></div>
             <div class="logo-tools">
               <button type="button" id="logoUpload" class="btn btn-ghost">Importer une image…</button>
-              <input type="file" id="logo" accept="image/*" class="sr-only">
+              <input type="file" id="logo" accept="image/png,image/jpeg,image/webp" class="sr-only">
               <label class="logo-color">Couleur <input type="color" id="logoColor" value="#000000"></label>
               <button type="button" id="logoClear" class="btn btn-ghost" hidden>Retirer</button>
             </div>
@@ -315,7 +315,8 @@
         <details><summary>Logo au centre</summary>
           <ul><li>Choisissez une <b>icône</b> de la galerie (24 icônes, couleur réglable) ou <b>importez votre image</b> (PNG, JPG, SVG).</li>
           <li>Dès qu'un logo est présent, la correction d'erreur passe automatiquement au <b>maximum</b> pour compenser la zone masquée.</li>
-          <li><b>Retirer</b> enlève le logo.</li></ul>
+          <li><b>Retirer</b> enlève le logo.</li>
+          <li>Formats acceptés pour une image personnelle : <b>PNG</b>, <b>JPEG</b>, <b>WebP</b>. Le <b>SVG</b> est refusé : ce format peut contenir du code, qui repartirait dans le fichier transmis à vos collègues.</li></ul>
           <p>Un logo masque une partie du code : testez systématiquement le scan après l'avoir ajouté, et évitez les images très détaillées ou très claires.</p></details>
 
         <details><summary>Cadre avec texte</summary>

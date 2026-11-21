@@ -3,6 +3,10 @@
   var $ = function (id) { return document.getElementById(id); };
   var esc = function (s) { return String(s).replace(/([\\;,":])/g, '\\$1'); };            // Wi-Fi
   var vc = function (s) { return String(s).replace(/([\\;,])/g, '\\$1').replace(/\n/g, '\\n'); };
+  // Police des textes DANS le SVG : un SVG ouvert ailleurs (ou chargé en <img> pour le PNG)
+  // n'hérite pas des polices de la page. On s'en tient donc à des familles présentes partout,
+  // plutôt que d'embarquer Marianne (poids, et licence de diffusion restreinte).
+  var SVGFONT = 'Arial, Helvetica, system-ui, sans-serif';
   var xml = function (s) { return String(s).replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }); };
 
   // ---- Types : champs [id, libellé, type, placeholder|options] et build() -> chaîne ('' = incomplet)
@@ -344,7 +348,7 @@
         '<circle cx="220" cy="220" r="220" fill="' + fcol + '"/>' +
         '<circle cx="220" cy="190" r="170" fill="#ffffff"/>' +
         '<g transform="translate(100 70) scale(0.8)">' + inner0 + '</g>' +
-        (text ? '<text x="220" y="402" font-family="Marianne, system-ui, sans-serif" font-size="' + fs + '" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="' + tcol + '">' + xml(text) + '</text>' : '') +
+        (text ? '<text x="220" y="402" font-family="' + SVGFONT + '" font-size="' + fs + '" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="' + tcol + '">' + xml(text) + '</text>' : '') +
         '</svg>';
     }
     var r = { classic: 24, top: 24, ribbon: 6, pill: 42 }[frameStyle] || 24, top = frameStyle === 'top';
@@ -354,7 +358,7 @@
       '<rect width="' + TW + '" height="' + TH + '" rx="' + r + '" fill="' + fcol + '"/>' +
       '<rect x="' + (M - 8) + '" y="' + (qy - 8) + '" width="316" height="316" rx="10" fill="#ffffff"/>' +
       '<g transform="translate(' + M + ' ' + qy + ')">' + inner + '</g>' +
-      (text ? '<text x="' + (TW / 2) + '" y="' + ty + '" font-family="Marianne, system-ui, sans-serif" font-size="26" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="' + tcol + '">' + xml(text) + '</text>' : '') +
+      (text ? '<text x="' + (TW / 2) + '" y="' + ty + '" font-family="' + SVGFONT + '" font-size="26" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="' + tcol + '">' + xml(text) + '</text>' : '') +
       '</svg>';
   }
 
@@ -391,7 +395,7 @@
           return tag.replace('height="300"', 'height="334"').replace('viewBox="0 0 300 300"', 'viewBox="0 0 300 334"');
         });
         s = s.replace('</svg>', '<rect x="0" y="300" width="300" height="34" fill="' + bg + '"/>' +
-          '<text x="150" y="323" font-family="Marianne, system-ui, sans-serif" font-size="17" font-weight="700" text-anchor="middle" fill="' + col + '">' + xml(cap) + '</text></svg>');
+          '<text x="150" y="323" font-family="' + SVGFONT + '" font-size="17" font-weight="700" text-anchor="middle" fill="' + col + '">' + xml(cap) + '</text></svg>');
       }
       return s;
     });
@@ -487,6 +491,12 @@
   $('logo').onchange = function () {
     var f = this.files[0];
     if (!f) return;
+    // Images matricielles uniquement : un SVG peut contenir du script, et il repartirait tel quel
+    // dans le fichier exporté, donc chez la personne à qui on le transmet.
+    if (!/^image\/(png|jpeg|webp|gif|bmp)$/.test(f.type)) {
+      this.value = '';
+      return say('Logo refusé : utilisez une image PNG, JPEG ou WebP (le format SVG n\'est pas accepté).');
+    }
     var r = new FileReader(); r.onload = function () { logoIcon = -1; logoURL = r.result; markIcons(); update(); }; r.readAsDataURL(f);
   };
   $('logoColor').addEventListener('input', function () {
