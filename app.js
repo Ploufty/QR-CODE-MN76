@@ -531,7 +531,7 @@
     if (!rows.length) return say('Ajoutez au moins une ligne.');
     say('Génération…');
     (function next() {
-      if (i === rows.length) return save(zip(files), fileName() + '.zip'), say(rows.length + ' QR codes générés.');
+      if (i === rows.length) return save(zip(files), 'codes-qr.zip'), say(rows.length + ' QR codes générés : codes-qr.zip');
       var row = rows[i], base = row[1] || ('qr-' + (i + 1)), n = used[base] = (used[base] || 0) + 1;
       if (n > 1) base += '-' + n;
       buildSVG(row[0], false).then(function (s) {
